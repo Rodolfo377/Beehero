@@ -32,9 +32,9 @@ public:
 
 */
 
-//void flower_in_smooth(int, int);
-/*void flower_out_smooth(int, int);
-void flower_stop();*/
+void flower_in_smooth(const int, const int);
+void flower_out_smooth(const int, const int);
+void flower_stop();
 
 Elements el;
 
@@ -42,44 +42,42 @@ bool collecting = false;
 bool stop = false;
 bool leave = false;
 
+const int WIDTH = 1000;
+const int HEIGHT = 600;
+sf::Event event;
+
+
+
+
+
+
+//KeyboardEvents ke;
+
+//Variables
+int beeXVelocity = 0;
+int beeYVelocity = 0;
+int tempX = 0;
+int tempY = 0;
+int flower_id = 0;
+
+//States
+
+bool play = true;
+bool gif_fly = true;
+bool up = false;
+bool down = false;
+bool left = false;
+bool right = false;
+bool fly_left = false;
+bool fly_right = true;
+
+
 int main()
 {
-
-	//Variables v;
-	const int WIDTH = 1000;
-	const int HEIGHT = 600;
-	sf::Event event;
 	sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "BeeHero");
 	window.setFramerateLimit(60);
 	window.setKeyRepeatEnabled(false);
-	
-	Elements el;
-
-	bool collecting = false;
-	bool stop = false;
-	bool leave = false;
-
-	
-	
-	//KeyboardEvents ke;
-	
-	//Variables
-	int beeXVelocity = 0;
-	int beeYVelocity = 0;
-	int tempX = 0;
-	int tempY = 0;
-	int flower_id = 0;
-
-	//States
-	
-	bool play = true;
-	bool gif_fly = true;
-	bool up = false;
-	bool down = false;
-	bool left = false;
-	bool right = false;
-	bool fly_left = false;
-	bool fly_right = true;
+	//Variables v;
 	
 	//Images
 	
@@ -210,46 +208,20 @@ int main()
 			 {
 				 
 				 //Smooth placement onto the flower
-				 if (el.player1.getPosition().x < tempX + 20)
-					 el.player1.move(1, 0);
-				 if (el.player1.getPosition().y < tempY)
-					 el.player1.move(0, 1);
-				 if (el.player1.getPosition().x > tempX + 20)
-					 el.player1.move(-1, 0);
-				 if (el.player1.getPosition().y > tempY)
-					 el.player1.move(0, -1);
-				 if (el.player1.getPosition().x == tempX + 20 && el.player1.getPosition().y == tempY)
-					 stop = true;
-				 //flower_in_smooth(tempX, tempY);
+				 
+				 flower_in_smooth(tempX, tempY);
 			 }
 			 //Holds the bee on the flower while it collects pollen
 			 if (stop == true)
 			 {
 				 std::cout << "Stop == true\n";
-				 fly_right = true;
-				 el.player1.setPosition(tempX + 20, tempY);
+				 flower_stop();
 			 }
 
 			 //Smooth transition out of the flower
 			 if (stop == false && leave == true)
 			 {
-				 if (el.player1.getPosition().y >= tempY - 40)
-				 {
-					 el.player1.move(0, -1);
-					 std::cout << " leaving...\n";
-				 }
-				 else
-				 { 
-					 std::cout << " left!\n";
-					 leave = false;
-					 collecting = false;
-					 /*
-						resets flower_index to a non-existing array index, 
-						and it will only be valid once it is redifined on 
-						the next Scanning that finds a collision with one 
-						of the flowers and the bee.*/
-					 flower_id = 1000;
-				 }
+				 flower_out_smooth(tempX, tempY);
 			 }
 			 
 		}
@@ -274,8 +246,8 @@ int main()
 	return 0;
 }
 
-/*void flower_in_smooth(int tempX, int tempY)
-
+void flower_in_smooth(const int tempX, const int tempY)
+{
 	
 	if (el.player1.getPosition().x < tempX + 20)
 		el.player1.move(1, 0);
@@ -291,14 +263,30 @@ int main()
 	if (el.player1.getPosition().x == tempX + 20 && el.player1.getPosition().y == tempY)
 		stop = true;
 }
-/*
+
 void flower_stop()
 {
-
+	fly_right = true;
+	el.player1.setPosition(tempX + 20, tempY);
 }
 
-void flower_out_smooth(int tempX, int tempY)
+void flower_out_smooth(const int tempX, const int tempY)
 {
-
+	if (el.player1.getPosition().y >= tempY - 40)
+	{
+		el.player1.move(0, -1);
+		std::cout << " leaving...\n";
+	}
+	else
+	{
+		std::cout << " left!\n";
+		leave = false;
+		collecting = false;
+		/*
+		resets flower_index to a non-existing array index,
+		and it will only be valid once it is redifined on
+		the next Scanning that finds a collision with one
+		of the flowers and the bee.*/
+		flower_id = 1000;
+	}
 }
-*/
