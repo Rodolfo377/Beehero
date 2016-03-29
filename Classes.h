@@ -19,7 +19,7 @@ public:
 	//methos will be called every time the player presses SPACE
 	void harvest()
 	{
-		if (polen > 0)
+		if (polen > 1)
 		{
 			polen--; 
 			ripe = true;

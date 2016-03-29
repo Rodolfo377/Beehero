@@ -12,6 +12,7 @@ class Elements
 	which are corresponding to their respective type of flower */
 public:
 	sf::Texture flower_tex[4];
+	sf::Texture flower_empty[4];
 	sf::Texture bee1_right;
 	sf::Texture bee2_right;
 	sf::Texture bee1_left;
@@ -51,6 +52,31 @@ public:
 		{
 			std::cout << "Could not find 'orchid_full.png' image...\n";
 		}
+
+		//Empty
+
+		if (!flower_empty[0].loadFromFile("Images/Scenario/flowers/rose_empty.png"))
+		{
+			std::cout << "Could not find 'rose_full.png' image...\n";
+		}
+
+		if (!flower_empty[1].loadFromFile("Images/Scenario/flowers/violet_empty.png"))
+		{
+			std::cout << "Could not find 'violet_full.png' image...\n";
+		}
+
+		if (!flower_empty[2].loadFromFile("Images/Scenario/flowers/orchid_empty.png"))
+		{
+			std::cout << "Could not find 'orchid_full.png' image...\n";
+		}
+
+		if (!flower_empty[3].loadFromFile("Images/Scenario/flowers/sunflower_empty.png"))
+		{
+			
+			std::cout << "Could not find 'sunflower_full.png' image...\n";
+		}
+
+		//Images of bee flying
 
 		if (bee1_right.loadFromFile("Images/bee_worker_flying_1_right.png") == false)
 		{
@@ -132,5 +158,21 @@ public:
 	sf::RectangleShape getPlayer1()
 	{
 		return player1;
+	}
+
+	//index relative to the only flower that wont be empty
+	void setEmptyFlowers(int index_full)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (i == index_full)
+			{
+				flowers[i].setTexture(&flower_tex[i]);
+			}
+			else
+			{
+				flowers[i].setTexture(&flower_empty[i]);
+			}
+		}
 	}
 };

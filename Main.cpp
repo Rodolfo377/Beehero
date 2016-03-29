@@ -360,4 +360,5 @@ void set_new_flower()
 	garden[flower_available].setValues(6, true);
 	std::cout << "polen: " << garden[flower_available].polen << std::endl;
 	std::cout << flower_names[flower_available] << std::endl;
+	el.setEmptyFlowers(flower_available);
 }
