@@ -3,6 +3,7 @@
 
 int check = 0;
 int time_left = 60;
+int start = 0;
 
 int random_n_generator(int start, int end)
 {
@@ -17,27 +18,29 @@ bool timer_check()
 	bool game_over = false;
 	
 	int total_seconds = 0;
-	int beginning;
-	int end;
+	
+	int end = 0;
 
 	check += 1;
 
 	//If it is the first time accessing the function, define the timer start instant
 	if (check == 1)
 	{
-		beginning = time(NULL);
+		std::cout << "*******begginning!\n";
+		start = time(NULL);
 
 	}
 
 	end = time(NULL);
 
 	//calculates the difference between the instant it started and the most updated time
-	total_seconds = difftime(end, beginning);
+	total_seconds = difftime(end, start);
 	
 	time_left = 60 - total_seconds;
 
 	if (time_left <= 0)
 	{
+		//std::cout << "begginning: " << beginning <<" "<<" Game Over\n";
 		game_over = true;
 	}
 	
