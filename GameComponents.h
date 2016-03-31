@@ -4,6 +4,10 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
+#include <string>
+#include <iomanip>
+#include <locale>
+#include <sstream>
 
 
 class Elements
@@ -27,6 +31,11 @@ public:
 	
 	sf::RectangleShape flowers[4];
 	sf::RectangleShape player1;
+	
+	//Font
+	sf::Font font;
+	sf::Text timer;
+	sf::Text points;
 	
 
 public:
@@ -101,9 +110,15 @@ public:
 			std::cout << "Could not find 'landscape under stormy sky .png' image...\n";
 		}
 
-		if (mission_background.loadFromFile("Images/Scenario/background/mission_1.png") == false)
+		if (mission_background.loadFromFile("Images/Scenario/background/MahGrassField.png") == false)
 		{
 			std::cout << "Could not find 'mission_1.png' image...\n";
+		}
+
+		//Font
+		if (font.loadFromFile("Fonts/arial.ttf") == 0)
+		{
+			std::cout << "Could not find 'arial.ttf font...\n";
 		}
 	}
 
@@ -152,12 +167,44 @@ public:
 	void load_player1()
 	{
 		player1.setSize(sf::Vector2f(30, 30));
-		player1.setPosition(800, 200);
+		player1.setPosition(430, 300);
 		player1.setTexture(&bee1_right);
 	}
 	sf::RectangleShape getPlayer1()
 	{
 		return player1;
+	}
+
+	void loadTimer(int sec)
+	{
+		std::string seconds;
+
+		std::ostringstream convert;
+		convert << sec;
+		seconds = convert.str();
+		
+		
+		timer.setFont(font);
+		timer.setCharacterSize(30);
+		timer.setString(seconds);
+
+		timer.setPosition(400, 10);
+	}
+
+	void loadScore(int n)
+	{
+		std::string score;
+
+		std::ostringstream convert;
+		convert << n;
+		score = convert.str();
+
+
+		points.setFont(font);
+		points.setCharacterSize(30);
+		points.setString(score);
+
+		points.setPosition(600, 10);
 	}
 
 	//index relative to the only flower that wont be empty

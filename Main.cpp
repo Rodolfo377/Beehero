@@ -48,6 +48,8 @@ Flowers sunflower;
 Flowers garden[] = { rose, violet, orchid, sunflower };
 char* flower_names[] = { "rose", "violet", "orchid", "sunflower"};
 
+Bees bumbleBee;
+
 bool collecting = false;
 bool stop = false;
 bool leave = false;
@@ -74,7 +76,7 @@ int flower_id = 0;
 int times_stop = 0;
 int space_count = 0;
 int flower_available;
-
+int polen_Score = 0;
 //States
 
 bool play = true;
@@ -106,13 +108,26 @@ int main()
 
 	//Music
 
+	//Font
+	
 
 	set_new_flower();
 
+
+
 	while (play == true)
 	{
+		el.loadTimer(time_left);
+		polen_Score = bumbleBee.getPoints();
+		el.loadScore(polen_Score);
+		/*polen_Score = bumbleBee.getPoints();
+		el.loadFont(polen_Score, el.points, 600, 10, 30);*/
 		
 
+		if (timer_check() == true)
+		{
+			play = false;
+		}
 		/****************Events******************/
 		while (window.pollEvent(event))
 		{
@@ -161,6 +176,7 @@ int main()
 				if (stop == true)
 				{
 					garden[flower_available].harvest();
+					bumbleBee.add_points();
 
 					if (garden[flower_available].ripe == false)
 					{
@@ -187,10 +203,10 @@ int main()
 
 		/****************Logic******************/
 
-		if (up == true) { beeYVelocity = -2; }
-		if (left == true) { beeXVelocity = -2;}
-		if (down == true) {beeYVelocity = 2;}
-		if (right == true) { beeXVelocity = 2; }	
+		if (up == true) { beeYVelocity = -3; }
+		if (left == true) { beeXVelocity = -3;}
+		if (down == true) {beeYVelocity = 3;}
+		if (right == true) { beeXVelocity = 3; }	
 		if (down == false && up == false) { beeYVelocity = 0; }
 		if (left == false && right == false) { beeXVelocity = 0; }
 		
@@ -282,7 +298,8 @@ int main()
 		}
 
 		window.draw(el.player1);
-		
+		window.draw(el.timer);
+		window.draw(el.points);
 		window.display();
 
 		//std::cout << "\ncollecting: " << collecting << " tempX = " << tempX << " tempY = " << tempY;

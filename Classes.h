@@ -48,6 +48,17 @@ public:
 
 class Bees
 {
+private:
+	int score = 0;
+public:
+	void add_points()
+	{
+		score++;
+	}
+	int getPoints()
+	{
+		return score;
+	}
 
 };
 
