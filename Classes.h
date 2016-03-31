@@ -4,6 +4,8 @@
 
 class Flowers
 {
+private:
+	Methods m;
 public:
 	int polen;
 	int harvest_time;
@@ -12,7 +14,7 @@ public:
 	void setValues(int input1,  bool input3)
 	{
 		polen = input1;
-		harvest_time = random_n_generator(3, 10);
+		harvest_time = m.random_n_generator(3, 10);
 		ripe = input3;
 	}
 

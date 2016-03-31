@@ -14,6 +14,9 @@ class Elements
 {
 	/*The order of the elements, in each of the arrays below is: Rose, Violet, Sunflower
 	which are corresponding to their respective type of flower */
+private:
+	int a = 255;
+
 public:
 	sf::Texture flower_tex[4];
 	sf::Texture flower_empty[4];
@@ -23,12 +26,16 @@ public:
 	sf::Texture bee2_left;
 	sf::Texture painting;
 	sf::Texture mission_background;
+	sf::Texture plus_one;
+	//sf::Texture plus_one;
+
 	const int WIDTH = 1000;
 	const int HEIGHT = 600;
-
+	int sprite_index = -1;
+	int tempXflower = 0;
+	int tempYflower = 0;
 
 	sf::RectangleShape background;
-	
 	sf::RectangleShape flowers[4];
 	sf::RectangleShape player1;
 	
@@ -36,6 +43,11 @@ public:
 	sf::Font font;
 	sf::Text timer;
 	sf::Text points;
+
+	sf::Sprite sprite_score;
+
+	//Sound
+	
 	
 
 public:
@@ -112,7 +124,7 @@ public:
 
 		if (mission_background.loadFromFile("Images/Scenario/background/MahGrassField.png") == false)
 		{
-			std::cout << "Could not find 'mission_1.png' image...\n";
+			std::cout << "Could not find 'MahGrassField.png' image...\n";
 		}
 
 		//Font
@@ -120,6 +132,15 @@ public:
 		{
 			std::cout << "Could not find 'arial.ttf font...\n";
 		}
+
+		//Sprites
+		if (plus_one.loadFromFile("Images/Sprites/Plus_one.png") == 0)
+		{
+			std::cout << "Could not find 'Plus_one.png'\n";
+		}
+
+		//Sound
+		
 	}
 
 	//This loads the image on the window, placing each of the RectangleShape objects in a certain place
@@ -186,11 +207,11 @@ public:
 		
 		timer.setFont(font);
 		timer.setCharacterSize(30);
-		timer.setString(seconds);
+		timer.setString("Time: "+seconds+"s");
 
 		timer.setPosition(400, 10);
 	}
-
+	//loads the most recent score on the screen as a Text
 	void loadScore(int n)
 	{
 		std::string score;
@@ -202,12 +223,14 @@ public:
 
 		points.setFont(font);
 		points.setCharacterSize(30);
-		points.setString(score);
+		points.setString("Score: "+score);
 
 		points.setPosition(600, 10);
 	}
 
 	//index relative to the only flower that wont be empty
+	//this function will change the textures of all the flowers to make them look empty, 
+	//while only one will look full of polen
 	void setEmptyFlowers(int index_full)
 	{
 		for (int i = 0; i < 4; i++)
@@ -222,4 +245,36 @@ public:
 			}
 		}
 	}
+
+	//Sets the '+1' sprite next to the flower everytime it is called (when the player harvests a flower)
+	void loadScoreSprite(int flower_index)
+	{
+		//sprite_score.setSize(sf::Vector2f(30, 30));		
+		sprite_score.setTexture(plus_one);
+		tempXflower = flowers[flower_index].getPosition().x + 100;
+		tempYflower = flowers[flower_index].getPosition().y;
+		sprite_score.setPosition(tempXflower, tempYflower);
+		//std::cout << "tempXflower: " << tempXflower << " tempYflower: " << tempYflower <<"\n";
+		
+	}
+
+	//gives the fading out effect to the plus one image
+	//this function code was adapted from http://en.sfml-dev.org/forums/index.php?topic=2693.0
+	void fade_out(int index)
+	{
+		/*
+		sprite_score.setColor(sf::Color(255, 255, 255, a));
+		a=-10;*/
+
+		std::cout << "fading\n";
+		sprite_score.move(0, -1);
+
+		if (sprite_score.getPosition().y > tempYflower - 10)
+		{
+			//kill sprite
+			sprite_score.setColor(sf::Color(255, 255, 255, 0));
+		}
+	}
+	
+	
 };

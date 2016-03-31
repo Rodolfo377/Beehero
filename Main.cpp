@@ -16,6 +16,9 @@
 #include "GameComponents.h"
 #include "Classes.h"
 
+/*The source code is adapted from a Udemy Course called 'Learn c++ game development' https://www.udemy.com/learn-c-game-development/ 
+in which the basic functionality of the SFML library is explored. However, this game has its own mechanics and art.*/
+
 /*
 class Variables
 {
@@ -44,6 +47,8 @@ Flowers rose;
 Flowers violet;
 Flowers orchid;
 Flowers sunflower;
+Methods game;
+Methods plus_one;
 
 Flowers garden[] = { rose, violet, orchid, sunflower };
 char* flower_names[] = { "rose", "violet", "orchid", "sunflower"};
@@ -53,6 +58,7 @@ Bees bumbleBee;
 bool collecting = false;
 bool stop = false;
 bool leave = false;
+bool draw = false;
 
 const int WIDTH = 1000;
 const int HEIGHT = 600;
@@ -77,6 +83,7 @@ int times_stop = 0;
 int space_count = 0;
 int flower_available;
 int polen_Score = 0;
+int fly_counter = 0;
 //States
 
 bool play = true;
@@ -87,7 +94,7 @@ bool left = false;
 bool right = false;
 bool fly_left = false;
 bool fly_right = true;
-
+bool harvesting = false;
 bool space = false;
 
 int main()
@@ -105,7 +112,18 @@ int main()
 	el.load_player1();
 
 	//Sound
+	sf::SoundBuffer collectBuffer;
 
+	sf::Sound collect;
+
+	if (collectBuffer.loadFromFile("Sound/polen_pickup.wav") == 0)
+	{
+		std::cout << "'polen_pickup.wav' not found...\n";
+		
+	}
+
+	collect.setBuffer(collectBuffer);
+	
 	//Music
 
 	//Font
@@ -113,18 +131,20 @@ int main()
 
 	set_new_flower();
 
-
+	game.timeLimit = 60;
+	plus_one.timeLimit = 1;
+	el.loadScoreSprite(flower_available);
 
 	while (play == true)
 	{
-		el.loadTimer(time_left);
+		el.loadTimer(game.time_left);
 		polen_Score = bumbleBee.getPoints();
 		el.loadScore(polen_Score);
 		/*polen_Score = bumbleBee.getPoints();
 		el.loadFont(polen_Score, el.points, 600, 10, 30);*/
 		
 
-		if (timer_check() == true)
+		if (game.timer_check() <= 0)
 		{
 			play = false;
 		}
@@ -177,7 +197,10 @@ int main()
 				{
 					garden[flower_available].harvest();
 					bumbleBee.add_points();
-
+					harvesting = true;
+					el.loadScoreSprite(flower_available);
+					collect.play();
+					
 					if (garden[flower_available].ripe == false)
 					{
 						//stop harvesting
@@ -211,6 +234,25 @@ int main()
 		if (left == false && right == false) { beeXVelocity = 0; }
 		
 		el.player1.move(beeXVelocity, beeYVelocity);
+		
+		if (harvesting == true)
+		{
+			el.sprite_score.move(0, -1);
+			fly_counter++;
+
+			if (fly_counter == 50)
+			{
+				std::cout << "harvesting false!!!";
+				harvesting = false;
+				fly_counter = 0;
+			}
+
+		}
+		if (harvesting == false)
+		{
+			el.loadScoreSprite(flower_available);
+		}
+
 		
 		//Makes the bee flap its wings
 
@@ -247,7 +289,11 @@ int main()
 
 		//Scanning
 		for (int i = 0; i < 4; i++)
-		{
+		{	//if the bee is inside the flower space, the index of the flower 
+			//is saved and the boolean variable collecting is set to true, which triggers the methods that will:
+			//1) guide the bee towards the center of the flower 
+			//2)  hold it there so the player can start harvesting the flower
+			//3) once the player is done harvesting - polen runs out- the bee will be lifted just above the flower and set free
 			if (el.player1.getGlobalBounds().intersects(el.flowers[i].getGlobalBounds()) == true && leave == false)
 			{
 				if (i == flower_available)
@@ -292,17 +338,35 @@ int main()
 		window.clear();
 		window.draw(el.background);
 
+		//draws all the 4 flowers on the screen
 		for (int j = 0; j < 4; j++)
 		{
 			window.draw(el.getFlower(j));
 		}
-
+		//std::cout << "harvesting: " << harvesting << "\n";
 		window.draw(el.player1);
 		window.draw(el.timer);
 		window.draw(el.points);
+
+		if (harvesting == true)
+		{
+			window.draw(el.sprite_score);
+		}
+
+		
+		
+		/*else if (draw==true )
+		{
+				std::cout << "time up\n";
+				draw = false;
+				harvesting = false;
+				plus_one.check = 0;
+				plus_one.time_left = 2;
+				el.sprite_index++;
+			
+		}*/
 		window.display();
 
-		//std::cout << "\ncollecting: " << collecting << " tempX = " << tempX << " tempY = " << tempY;
 	}
 
 	window.close();
@@ -330,22 +394,6 @@ void flower_stop()
 	fly_right = true;
 	el.player1.setPosition(tempX + 20, tempY);
 	
-	/*
-	if (times_stop == 1)
-	{
-		beginning = time(NULL);
-
-	}
-
-	end = time(NULL);
-
-	//If the bee has spent more than 5 seconds harvesting the flower, it leaves the flower.
-	if (difftime(end, beginning) >= 5)
-	{
-		times_stop = 0;
-		stop = false;
-		leave = true;
-	}*/
 
 }
 
@@ -354,11 +402,11 @@ void flower_out_smooth(const int tempX, const int tempY)
 	if (el.player1.getPosition().y >= tempY - 40)
 	{
 		el.player1.move(0, -3);
-		std::cout << " leaving...\n";
+		//std::cout << " leaving...\n";
 	}
 	else
 	{
-		std::cout << " left!\n";
+		//std::cout << " left!\n";
 		leave = false;
 		collecting = false;
 		/*
@@ -373,9 +421,10 @@ void flower_out_smooth(const int tempX, const int tempY)
 
 void set_new_flower()
 {
-	flower_available = random_n_generator(0, 4);
+	flower_available = game.random_n_generator(0, 4);
 	garden[flower_available].setValues(6, true);
 	std::cout << "polen: " << garden[flower_available].polen << std::endl;
 	std::cout << flower_names[flower_available] << std::endl;
 	el.setEmptyFlowers(flower_available);
 }
+
