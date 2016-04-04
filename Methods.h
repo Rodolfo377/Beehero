@@ -45,4 +45,9 @@ public:
 		return time_left;
 	}
 
+	void reset_timer()
+	{
+		check = 0;
+	}
+
 };

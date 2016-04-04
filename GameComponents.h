@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <locale>
 #include <sstream>
-
+#include <vector>
 
 class Elements
 {
@@ -17,17 +17,14 @@ class Elements
 private:
 	int a = 255;
 
-public:
+
 	sf::Texture flower_tex[4];
 	sf::Texture flower_empty[4];
-	sf::Texture bee1_right;
-	sf::Texture bee2_right;
-	sf::Texture bee1_left;
-	sf::Texture bee2_left;
 	sf::Texture painting;
 	sf::Texture mission_background;
 	sf::Texture plus_one;
-	//sf::Texture plus_one;
+	sf::Texture water_drop;
+	
 
 	const int WIDTH = 1000;
 	const int HEIGHT = 600;
@@ -35,14 +32,27 @@ public:
 	int tempXflower = 0;
 	int tempYflower = 0;
 
+	
+
+
+public:
+	sf::Texture bee1_right;
+	sf::Texture bee2_right;
+	sf::Texture bee1_left;
+	sf::Texture bee2_left;
+
 	sf::RectangleShape background;
 	sf::RectangleShape flowers[4];
 	sf::RectangleShape player1;
+
+	sf::Sprite rainSprite;
 	
+
 	//Font
 	sf::Font font;
 	sf::Text timer;
 	sf::Text points;
+	sf::Text health;
 
 	sf::Sprite sprite_score;
 
@@ -139,7 +149,10 @@ public:
 			std::cout << "Could not find 'Plus_one.png'\n";
 		}
 
-		//Sound
+		if (water_drop.loadFromFile("Images/Scenario/Obstacles/water_drop.png") == 0)
+		{
+			std::cout << "Could not find 'water_drop.png'...\n";
+		}
 		
 	}
 
@@ -215,8 +228,8 @@ public:
 	void loadScore(int n)
 	{
 		std::string score;
-
 		std::ostringstream convert;
+
 		convert << n;
 		score = convert.str();
 
@@ -227,6 +240,21 @@ public:
 
 		points.setPosition(600, 10);
 	}
+	void load_hp(int m)
+	{
+		std::string life;
+		std::ostringstream translate;
+		translate << m;
+		life = translate.str();
+
+		health.setFont(font);
+		health.setCharacterSize(30);
+		health.setString("HP: "+life);
+
+		health.setPosition(800, 10);
+
+	}
+
 
 	//index relative to the only flower that wont be empty
 	//this function will change the textures of all the flowers to make them look empty, 
@@ -251,7 +279,7 @@ public:
 	{
 		//sprite_score.setSize(sf::Vector2f(30, 30));		
 		sprite_score.setTexture(plus_one);
-		tempXflower = flowers[flower_index].getPosition().x + 100;
+		tempXflower = flowers[flower_index].getPosition().x + 50;
 		tempYflower = flowers[flower_index].getPosition().y;
 		sprite_score.setPosition(tempXflower, tempYflower);
 		//std::cout << "tempXflower: " << tempXflower << " tempYflower: " << tempYflower <<"\n";
@@ -275,6 +303,19 @@ public:
 			sprite_score.setColor(sf::Color(255, 255, 255, 0));
 		}
 	}
+	//loads the water drop image to a sprite that can be moved
+	void loadRain()
+	{
+		
+		rainSprite.setTexture(water_drop);
+		
+	}
+
+	void rainPosition(int x, int y)
+	{
+		rainSprite.setPosition(x, y);
+	}
+	//make the rectangle container move downwards by 1 pixel everytime it is called , simulating rain
 	
 	
 };

@@ -36,10 +36,17 @@ public:
 
 */
 
+//function protoypes
 void flower_in_smooth(const int, const int);
 void flower_out_smooth(const int, const int);
 void flower_stop();
 void set_new_flower();
+void create_drop();
+void move_drop();
+void take_damage();
+bool detect_collision_water();
+void blink_bee();
+
 
 //Objects
 Elements el;
@@ -49,6 +56,12 @@ Flowers orchid;
 Flowers sunflower;
 Methods game;
 Methods plus_one;
+Methods r;
+////object that will be responsible for calling the timer_check method in order to slow the bee down when it gets hurt
+Methods h;
+//object that will be responsible for calling the timer_check method in order to show the image of the bee on the screen
+//Will be useful when the bee is hit by a water drop
+Methods s;
 
 Flowers garden[] = { rose, violet, orchid, sunflower };
 char* flower_names[] = { "rose", "violet", "orchid", "sunflower"};
@@ -58,7 +71,9 @@ Bees bumbleBee;
 bool collecting = false;
 bool stop = false;
 bool leave = false;
-bool draw = false;
+
+
+
 
 const int WIDTH = 1000;
 const int HEIGHT = 600;
@@ -69,21 +84,26 @@ time_t beginning;
 
 
 
-
-
-//KeyboardEvents ke;
-
-//Variables
+///////Variables
 int beeXVelocity = 0;
 int beeYVelocity = 0;
+//tempX holds the temporary x coordinate of the flower that is available to be harvested
 int tempX = 0;
+//tempX holds the temporary y coordinate of the flower that is available to be harvested
 int tempY = 0;
+//index of the flower that is available
 int flower_id = 0;
 int times_stop = 0;
 int space_count = 0;
 int flower_available;
 int polen_Score = 0;
 int fly_counter = 0;
+int health_points = 0;
+//collision_counter variable determines how many times the function take_damage has been called, so it wont unnecessarily repeat its comands
+int collision_counter = 0;
+//blink variable determines how many times the bee has blinked - used in blink_bee() function
+int blink = 0;
+
 //States
 
 bool play = true;
@@ -96,6 +116,14 @@ bool fly_left = false;
 bool fly_right = true;
 bool harvesting = false;
 bool space = false;
+bool show_bee = true;
+//hurt tells if the bee was struck by a water drop
+bool hurt = false;
+
+
+
+std::vector<sf::Sprite> rain;
+
 
 int main()
 {
@@ -110,44 +138,79 @@ int main()
 	el.load_flowers();
 	el.load_background();
 	el.load_player1();
+	el.loadRain();
 
 	//Sound
 	sf::SoundBuffer collectBuffer;
-
+	sf::SoundBuffer waterBuffer;
 	sf::Sound collect;
+	sf::Sound hit;
 
 	if (collectBuffer.loadFromFile("Sound/polen_pickup.wav") == 0)
 	{
 		std::cout << "'polen_pickup.wav' not found...\n";
-		
+	}
+	if (waterBuffer.loadFromFile("Sound/water_hit.wav") == 0)
+	{
+		std::cout << "'water_hit.wav' not found...\n";
 	}
 
 	collect.setBuffer(collectBuffer);
-	
+	hit.setBuffer(waterBuffer);
 	//Music
 
 	//Font
 	
+	
 
 	set_new_flower();
 
-	game.timeLimit = 60;
+	game.timeLimit = 90;
 	plus_one.timeLimit = 1;
 	el.loadScoreSprite(flower_available);
 
+	rain.push_back(el.rainSprite);
+	r.timeLimit = 2;
+
 	while (play == true)
 	{
+		
+		
+
 		el.loadTimer(game.time_left);
 		polen_Score = bumbleBee.getPoints();
+		health_points = bumbleBee.get_hp();
 		el.loadScore(polen_Score);
+		el.load_hp(health_points);
 		/*polen_Score = bumbleBee.getPoints();
 		el.loadFont(polen_Score, el.points, 600, 10, 30);*/
-		
+
 
 		if (game.timer_check() <= 0)
 		{
 			play = false;
 		}
+
+		//make rain again
+		if (game.timer_check()%15== 0)
+		{
+			for (int i = 0; i < rain.size(); i++)
+			{
+				rain[i].setPosition(125 + (i) * 75, 0);
+			}
+		}
+		
+		//Every 2 seconds loads a new rain drop sprite
+
+		if (rain.size() < 8)
+		{
+			create_drop();
+		}
+		move_drop();
+
+		
+		
+
 		/****************Events******************/
 		while (window.pollEvent(event))
 		{
@@ -233,13 +296,32 @@ int main()
 		if (down == false && up == false) { beeYVelocity = 0; }
 		if (left == false && right == false) { beeXVelocity = 0; }
 		
+		//If a water drop struck the bee, it gets hurt and therefore it moves slowly 
+
+		if (hurt == true)
+		{
+			
+			blink_bee();
+			h.timeLimit = 2;
+			if (h.timer_check() > 0)
+			{
+				if (up == true) { beeYVelocity = -1; }
+				if (left == true) { beeXVelocity = -1; }
+				if (down == true) { beeYVelocity = 1; }
+				if (right == true) { beeXVelocity = 1; }
+			}
+			
+			if (h.timer_check() <= 0){ hurt = false; h.reset_timer(); show_bee = true; }
+		}
 		el.player1.move(beeXVelocity, beeYVelocity);
 		
 		if (harvesting == true)
 		{
+			//moves the '+1' sprite upwards
 			el.sprite_score.move(0, -1);
 			fly_counter++;
 
+			//when the '+1' sprite has moved 50 pixels
 			if (fly_counter == 50)
 			{
 				std::cout << "harvesting false!!!";
@@ -283,7 +365,18 @@ int main()
 			gif_fly = false;
 		}
 
-		
+		//Checks if a water drop hit a bee
+		if (detect_collision_water() == true)
+		{
+			take_damage();
+			if (collision_counter == 1)
+				hit.play();
+			
+		}
+		if (detect_collision_water() == false)
+		{
+			collision_counter = 0;
+		}
 
 
 
@@ -333,6 +426,8 @@ int main()
 			 }
 			 
 		}
+
+
 		/****************Rendering******************/
 
 		window.clear();
@@ -344,27 +439,26 @@ int main()
 			window.draw(el.getFlower(j));
 		}
 		//std::cout << "harvesting: " << harvesting << "\n";
-		window.draw(el.player1);
+		if (show_bee == true)
+		{
+			window.draw(el.player1);
+		}
 		window.draw(el.timer);
 		window.draw(el.points);
+		window.draw(el.health);
+
+		for (int i = 0; i < rain.size(); i++)
+		{
+			window.draw(rain[i]);
+		
+		}
 
 		if (harvesting == true)
 		{
 			window.draw(el.sprite_score);
 		}
 
-		
-		
-		/*else if (draw==true )
-		{
-				std::cout << "time up\n";
-				draw = false;
-				harvesting = false;
-				plus_one.check = 0;
-				plus_one.time_left = 2;
-				el.sprite_index++;
-			
-		}*/
+
 		window.display();
 
 	}
@@ -428,3 +522,83 @@ void set_new_flower()
 	el.setEmptyFlowers(flower_available);
 }
 
+void create_drop()
+{
+	//small pause after the drop is created then moved
+	//works until the second to last drop
+		if (r.timer_check() <= 0)
+		{
+
+			rain.push_back(el.rainSprite);
+			r.reset_timer();
+			std::cout << rain.size() <<" drop created\n";
+			
+		}
+		//places the last created drop at a specific place
+		
+		rain[rain.size() - 1].setPosition(125 + (rain.size()) * 75, 0);
+		
+	
+}
+
+void move_drop()
+{
+	
+	for (int i = 0; i < rain.size(); i++)
+	{
+		//if it is the last drop, add a 2 second pause
+		if (i >= 7)
+		{
+			if (r.timer_check() <= 0)
+			{
+				rain[i].move(0, 2);
+			}
+		}
+		else
+		{
+			rain[i].move(0, 2);
+		}
+	}
+}
+
+bool detect_collision_water()
+{
+	bool wet = false;
+	for (int i = 0; i < rain.size(); i++)
+	{
+		if (el.player1.getGlobalBounds().intersects(rain[i].getGlobalBounds()) == true)
+		{
+			wet = true;
+		
+		}
+		
+	}
+	return wet;
+}
+
+void take_damage()
+{
+	collision_counter++;
+	
+	if (collision_counter == 1)
+	{
+		int p = bumbleBee.getPoints();
+		bumbleBee.setPoints(p / 2);
+
+		int q = bumbleBee.get_hp();
+		bumbleBee.set_hp((int)q*0.75);
+		std::cout << "take damage " << collision_counter << "\n";
+		hurt = true;
+	}
+}
+
+void blink_bee()
+{
+	blink++;
+	
+	if (blink % 5 == 0)
+	{
+		show_bee = true;
+	}
+	else{ show_bee = false; }
+}

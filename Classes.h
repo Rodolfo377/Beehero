@@ -52,6 +52,7 @@ class Bees
 {
 private:
 	int score = 0;
+	int hp = 10;
 public:
 	void add_points()
 	{
@@ -61,6 +62,24 @@ public:
 	{
 		return score;
 	}
+	void setPoints(int x)
+	{
+		score = x;
+	}
+
+	void add_hp()
+	{
+		hp++;
+	}
+	int get_hp()
+	{
+		return hp;
+	}
+	void set_hp(int y)
+	{
+		hp = y;
+	}
+	
 
 };
 
