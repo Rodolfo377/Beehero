@@ -14,7 +14,7 @@ public:
 	{
 		srand(time(NULL));
 		int result = rand() % end + start;
-		std::cout << "result: " << result << std::endl;
+		
 		return result;
 	}
 

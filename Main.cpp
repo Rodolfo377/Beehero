@@ -104,6 +104,7 @@ int collision_counter = 0;
 //blink variable determines how many times the bee has blinked - used in blink_bee() function
 int blink = 0;
 
+
 //States
 
 bool play = true;
@@ -121,7 +122,7 @@ bool show_bee = true;
 bool hurt = false;
 
 
-
+//vector that holds the water drops sprites that, when combined, will be the rain
 std::vector<sf::Sprite> rain;
 
 
@@ -161,7 +162,7 @@ int main()
 
 	//Font
 	
-	
+	int speed = 3;
 
 	set_new_flower();
 
@@ -185,24 +186,24 @@ int main()
 		/*polen_Score = bumbleBee.getPoints();
 		el.loadFont(polen_Score, el.points, 600, 10, 30);*/
 
-
-		if (game.timer_check() <= 0)
+		//If the game time's up or the bee has taken 10 hp of damage, game is over
+		if (game.timer_check() <= 0 || bumbleBee.get_hp() == 0)
 		{
 			play = false;
 		}
 
 		//make rain again
-		if (game.timer_check()%15== 0)
+		if (game.timer_check()%15== 0 && game.timer_check()<70)
 		{
 			for (int i = 0; i < rain.size(); i++)
 			{
-				rain[i].setPosition(125 + (i) * 75, 0);
+				rain[i].setPosition( 70+ (i) * 75, 0);
 			}
 		}
 		
 		//Every 2 seconds loads a new rain drop sprite
 
-		if (rain.size() < 8)
+		if (rain.size() < 10)
 		{
 			create_drop();
 		}
@@ -289,10 +290,10 @@ int main()
 
 		/****************Logic******************/
 
-		if (up == true) { beeYVelocity = -3; }
-		if (left == true) { beeXVelocity = -3;}
-		if (down == true) {beeYVelocity = 3;}
-		if (right == true) { beeXVelocity = 3; }	
+		if (up == true) { beeYVelocity = -speed; }
+		if (left == true) { beeXVelocity = -speed;}
+		if (down == true) {beeYVelocity = speed;}
+		if (right == true) { beeXVelocity = speed; }	
 		if (down == false && up == false) { beeYVelocity = 0; }
 		if (left == false && right == false) { beeXVelocity = 0; }
 		
@@ -302,16 +303,16 @@ int main()
 		{
 			
 			blink_bee();
+			//sets the timer to 2 seconds, that is how long the bee will move slower and blink
 			h.timeLimit = 2;
-			if (h.timer_check() > 0)
-			{
-				if (up == true) { beeYVelocity = -1; }
-				if (left == true) { beeXVelocity = -1; }
-				if (down == true) { beeYVelocity = 1; }
-				if (right == true) { beeXVelocity = 1; }
-			}
+			speed = 1;
 			
 			if (h.timer_check() <= 0){ hurt = false; h.reset_timer(); show_bee = true; }
+		}
+
+		if (hurt == false)
+		{
+			speed = 3;
 		}
 		el.player1.move(beeXVelocity, beeYVelocity);
 		
@@ -324,7 +325,7 @@ int main()
 			//when the '+1' sprite has moved 50 pixels
 			if (fly_counter == 50)
 			{
-				std::cout << "harvesting false!!!";
+				
 				harvesting = false;
 				fly_counter = 0;
 			}
@@ -517,8 +518,8 @@ void set_new_flower()
 {
 	flower_available = game.random_n_generator(0, 4);
 	garden[flower_available].setValues(6, true);
-	std::cout << "polen: " << garden[flower_available].polen << std::endl;
-	std::cout << flower_names[flower_available] << std::endl;
+	/*std::cout << "polen: " << garden[flower_available].polen << std::endl;
+	std::cout << flower_names[flower_available] << std::endl;*/
 	el.setEmptyFlowers(flower_available);
 }
 
@@ -531,12 +532,11 @@ void create_drop()
 
 			rain.push_back(el.rainSprite);
 			r.reset_timer();
-			std::cout << rain.size() <<" drop created\n";
 			
 		}
 		//places the last created drop at a specific place
 		
-		rain[rain.size() - 1].setPosition(125 + (rain.size()) * 75, 0);
+		rain[rain.size() - 1].setPosition(70 + (rain.size()) * 75, 0);
 		
 	
 }
@@ -547,7 +547,7 @@ void move_drop()
 	for (int i = 0; i < rain.size(); i++)
 	{
 		//if it is the last drop, add a 2 second pause
-		if (i >= 7)
+		if (i >= 9)
 		{
 			if (r.timer_check() <= 0)
 			{
@@ -576,6 +576,8 @@ bool detect_collision_water()
 	return wet;
 }
 
+//If the bee gets hit by a water drop, its polen score gets reduced to 60% 
+//of the previous value, and its health drops by half
 void take_damage()
 {
 	collision_counter++;
@@ -583,11 +585,10 @@ void take_damage()
 	if (collision_counter == 1)
 	{
 		int p = bumbleBee.getPoints();
-		bumbleBee.setPoints(p / 2);
+		bumbleBee.setPoints(p*0.6);
 
 		int q = bumbleBee.get_hp();
-		bumbleBee.set_hp((int)q*0.75);
-		std::cout << "take damage " << collision_counter << "\n";
+		bumbleBee.set_hp((int)q*0.5);
 		hurt = true;
 	}
 }
@@ -596,7 +597,7 @@ void blink_bee()
 {
 	blink++;
 	
-	if (blink % 5 == 0)
+	if (blink % 3 == 0)
 	{
 		show_bee = true;
 	}

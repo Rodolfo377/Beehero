@@ -25,26 +25,16 @@ public:
 		{
 			polen--; 
 			ripe = true;
-			std::cout << "polen harvested! " << polen << " left!\n";
+			
 		}
 		else
 		{
-			std::cout << "Empty!\n";
+			
 			ripe = false;
 		}
 		
 		
 	}
-
-	/*int random_timer()
-	{
-		int seed = time(NULL);
-		srand(seed);
-		harvest_time = rand() % 10 + 3;
-		return harvest_time;
-	}*/
-	
-	
 
 };
 
