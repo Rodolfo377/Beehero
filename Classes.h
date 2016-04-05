@@ -4,11 +4,11 @@
 
 class Flowers
 {
-private:
+public:
 	Methods m;
 public:
-	int polen;
-	int harvest_time;
+	int polen = 0;
+	int harvest_time = 0;
 	bool ripe = false;
 
 	void setValues(int input1,  bool input3)
