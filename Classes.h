@@ -7,15 +7,14 @@ class Flowers
 public:
 	Methods m;
 public:
-	int polen = 0;
-	int harvest_time = 0;
+	int polen = 7;
 	bool ripe = false;
 
-	void setValues(int input1,  bool input3)
+	void setValues(int input1,  bool input2)
 	{
 		polen = input1;
-		harvest_time = m.random_n_generator(3, 10);
-		ripe = input3;
+		
+		ripe = input2;
 	}
 
 	//methos will be called every time the player presses SPACE

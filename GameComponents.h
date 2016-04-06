@@ -23,7 +23,8 @@ private:
 	sf::Texture painting;
 	sf::Texture mission_background;
 	sf::Texture plus_one;
-	sf::Texture water_drop;
+
+
 	
 
 	const int WIDTH = 1000;
@@ -40,6 +41,10 @@ public:
 	sf::Texture bee2_right;
 	sf::Texture bee1_left;
 	sf::Texture bee2_left;
+	sf::Texture water_heart;
+	sf::Texture water_time;
+	sf::Texture water_death;
+	sf::Texture water_drop;
 
 	sf::RectangleShape background;
 	sf::RectangleShape flowers[4];
@@ -153,7 +158,21 @@ public:
 		{
 			std::cout << "Could not find 'water_drop.png'...\n";
 		}
-		
+
+		if (water_heart.loadFromFile("Images/Scenario/Obstacles/water_heart.png") == 0)
+		{
+			std::cout << "Could not find 'water_heart.png'...\n";
+		}
+
+		if (water_time.loadFromFile("Images/Scenario/Obstacles/water_time.png") == 0)
+		{
+			std::cout << "Could not find 'water_time.png'...\n";
+		}
+
+		if (water_death.loadFromFile("Images/Scenario/Obstacles/water_death.png") == 0)
+		{
+			std::cout << "Could not find 'water_death.png'...\n";
+		}
 	}
 
 	//This loads the image on the window, placing each of the RectangleShape objects in a certain place
@@ -303,11 +322,13 @@ public:
 			sprite_score.setColor(sf::Color(255, 255, 255, 0));
 		}
 	}
-	//loads the water drop image to a sprite that can be moved
-	void loadRain()
+	/*loads the water drop image to a sprite that can be moved.
+	depending on what the parameter value is, it can also load water drops with an item inside*/
+	void loadRain(int n)
 	{
-		
+		if (n == 0)
 		rainSprite.setTexture(water_drop);
+	
 		
 	}
 

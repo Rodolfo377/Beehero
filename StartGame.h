@@ -51,6 +51,7 @@ class StartGame
 	*/
 
 	//Objects
+
 	Elements el;
 	Flowers rose;
 	Flowers violet;
@@ -58,7 +59,9 @@ class StartGame
 	Flowers sunflower;
 	Flowers garden[4];
 	Methods game;
-	Methods plus_one;
+	//object that
+	Methods steady_rain;
+	//r object that will serve to set the 2 seconds timer each rain drop has between each other at the begginning
 	Methods r;
 	////object that will be responsible for calling the timer_check method in order to slow the bee down when it gets hurt
 	Methods h;
@@ -113,6 +116,8 @@ class StartGame
 	//blink variable determines how many times the bee has blinked - used in blink_bee() function
 	int blink = 0;
 	int speed;
+	int drop_strike = 0;
+
 
 	//States
 
@@ -127,18 +132,28 @@ class StartGame
 	bool harvesting = false;
 	bool space = false;
 	bool show_bee = true;
+	/*placed tells us if the random_place method has been called at least once, which will trigger specific collision 
+	tests for the rain drop and the player, because from the moment there are items inside the rain drops, 
+	it will have different effects on the player rather than just damage its health or making the bee lose 
+	polen.
+	*/
+	bool placed = false;
+	
 	//hurt tells if the bee was struck by a water drop
 	bool hurt = false;
 
 
 	//vector that holds the water drops sprites that, when combined, will be the rain
 	std::vector<sf::Sprite> rain;
+	//array that holds the position index of the rain drop (from left to right) and the item index (see method place_item() )
+	int water_item[2];
+	int special_item[2];
 
 public:
 	StartGame()
 	{
 		
-		//Variables v;
+		
 
 		//Images
 
@@ -146,8 +161,9 @@ public:
 		el.load_flowers();
 		el.load_background();
 		el.load_player1();
-		el.loadRain();
-
+		//sets the rain drops to their default image
+		el.loadRain(0);
+		steady_rain.timeLimit = 15;
 		//Sound
 		
 
@@ -171,7 +187,7 @@ public:
 		set_new_flower();
 
 		game.timeLimit = 90;
-		plus_one.timeLimit = 1;
+		
 		el.loadScoreSprite(flower_available);
 
 		rain.push_back(el.rainSprite);
@@ -212,12 +228,33 @@ public:
 					play = false;
 				}
 
-				//make rain again
-				if (game.timer_check() % 15 == 0 && game.timer_check() < 70)
+				//makes it rain again every 15 seconds, after 20 seconds have passed
+				if ( game.timer_check() < 70 && steady_rain.timer_check() <= 0 )
 				{
+					steady_rain.reset_timer();
 					for (int i = 0; i < rain.size(); i++)
 					{
 						rain[i].setPosition(70 + (i)* 75, 0);
+						/*sets all the sprites to the default image- so in case the player 
+						reaches 100 points but loses it, the item wont be there again, but 
+						the drops will all be reset to be empty once more*/
+						rain[i].setTexture(el.water_drop);
+					}
+					//places a special item inside a rain drop
+					if (bumbleBee.getPoints() > 30)
+					{
+						int *p;
+						p = place_item();
+						for (int k = 0; k <= 1; k++)
+						{
+							water_item[k] = p[k];
+							/*std::cout << "\nwater_item["<<k<<"] = " << water_item[k] << "\n";
+							std::cout << "p["<<k<< "] = "<< p[k] << "\n";
+							std::cout << "adresses: \n" << &water_item[k] << "\n" << &p[k] << "\n" << place_item() + k;*/
+						}
+						placed = true;
+						//make a small pause before move the rain drops downwards
+						r.reset_timer();
 					}
 				}
 
@@ -227,7 +264,10 @@ public:
 				{
 					create_drop();
 				}
+
 				move_drop();
+
+				
 
 
 
@@ -266,9 +306,7 @@ public:
 
 					//Temporary event that will be equivalent to the time it takes to harvest a flower
 					if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z)
-					{
-
-						std::cout << "Z!\n";
+					{						
 						stop = false;
 						leave = true;
 					}
@@ -540,7 +578,7 @@ public:
 	void set_new_flower()
 	{
 		flower_available = game.random_n_generator(0, 4);
-		garden[flower_available].setValues(6, true);
+		garden[flower_available].setValues(7, true);
 		/*std::cout << "polen: " << garden[flower_available].polen << std::endl;
 		std::cout << flower_names[flower_available] << std::endl;*/
 		el.setEmptyFlowers(flower_available);
@@ -566,23 +604,42 @@ public:
 
 	void move_drop()
 	{
-
-		for (int i = 0; i < rain.size(); i++)
+		if (placed == false)
 		{
-			//if it is the last drop, add a 2 second pause
-			if (i >= 9)
+			for (int i = 0; i < rain.size(); i++)
 			{
-				if (r.timer_check() <= 0)
+				//if it is the last drop, add a 2 second pause
+
+				if (i >= 9)
+				{
+					if (r.timer_check() <= 0)
+					{
+						rain[i].move(0, 2);
+					}//if
+				}//if
+
+				else
 				{
 					rain[i].move(0, 2);
+				}//else
+			}//for
+		}//if(placed == false)
+		if (placed == true && r.timer_check() <= 0)
+		{
+			std::cout << "placed\n";
+			
+				std::cout << "timer\n";
+				for (int j = 0; j < rain.size(); j++)
+				{
+					rain[j].move(0, 2);
 				}
-			}
-			else
-			{
-				rain[i].move(0, 2);
-			}
-		}
-	}
+				
+			
+		}//if (placed == true)
+
+		
+		
+	}//move_drop()
 
 	bool detect_collision_water()
 	{
@@ -592,7 +649,7 @@ public:
 			if (el.player1.getGlobalBounds().intersects(rain[i].getGlobalBounds()) == true)
 			{
 				wet = true;
-
+				drop_strike = i;
 			}
 
 		}
@@ -607,12 +664,55 @@ public:
 
 		if (collision_counter == 1)
 		{
-			int p = bumbleBee.getPoints();
-			bumbleBee.setPoints(p*0.6);
+			if (placed == false)
+			{
 
-			int q = bumbleBee.get_hp();
-			bumbleBee.set_hp((int)q*0.5);
-			hurt = true;
+				int p = bumbleBee.getPoints();
+				bumbleBee.setPoints(p*0.6);
+
+				int q = bumbleBee.get_hp();
+				bumbleBee.set_hp((int)q*0.5);
+				hurt = true;
+
+			}
+			else
+			{
+
+				//tests if the bee was truck by a drop containing an item
+				if (drop_strike == water_item[0])
+				{
+					//if so, checks what item is it and then decides what the response is going to be
+					switch (water_item[1])
+					{
+					case 1://death item
+						//wipes out the bumblebee's entire health
+						bumbleBee.set_hp(0);
+						break;
+					case 2://heart item
+						//restores the bumblebee's health completely
+						bumbleBee.set_hp(10);
+						break;
+					case 3://time item
+						//gives the player 15 more seconds of play
+						game.timeLimit += 15;
+						break;
+					default:
+						break;
+					}//closes switch
+				}//closes drop_strike if
+				else
+				{
+
+					int p = bumbleBee.getPoints();
+					bumbleBee.setPoints(p*0.6);
+
+					int q = bumbleBee.get_hp();
+					bumbleBee.set_hp((int)q*0.5);
+					hurt = true;
+
+				}
+
+			}//closes else (placed == true)
 		}
 	}
 
@@ -625,6 +725,37 @@ public:
 			show_bee = true;
 		}
 		else{ show_bee = false; }
+	}
+
+	//after the player has scored enough points, random items may be found inside the one of the rain drops
+	int * place_item()
+	{
+		//sets the rain drop in which the item is going to be in  random fashion
+		int drop_id = game.random_n_generator(0, 9);
+		
+		//sets the item that is going to be displayed inside the chosen rain drop
+		int item_id = game.random_n_generator(1, 3);
+		
+
+		switch (item_id)
+		{
+			
+		case 1:
+			rain[drop_id].setTexture(el.water_death);
+			break;
+		case 2:
+			rain[drop_id].setTexture(el.water_heart);
+			break;
+		case 3:
+			rain[drop_id].setTexture(el.water_time);
+			break;
+		default:
+			break;
+		}
+		special_item[0] = drop_id;
+		special_item[1] = item_id;
+		
+ 		return special_item;
 	}
 
 };
