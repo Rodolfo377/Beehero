@@ -12,11 +12,8 @@
 
 class Elements
 {
-	/*The order of the elements, in each of the arrays below is: Rose, Violet, Sunflower
-	which are corresponding to their respective type of flower */
+	
 private:
-	int a = 255;
-
 
 	sf::Texture flower_tex[4];
 	sf::Texture flower_empty[4];
@@ -24,11 +21,9 @@ private:
 	sf::Texture mission_background;
 	sf::Texture plus_one;
 
-
-	
-
 	const int WIDTH = 1000;
 	const int HEIGHT = 600;
+
 	int sprite_index = -1;
 	int tempXflower = 0;
 	int tempYflower = 0;

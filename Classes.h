@@ -10,7 +10,7 @@ public:
 	int polen = 7;
 	bool ripe = false;
 
-	void setValues(int input1,  bool input2)
+	void setValues(const int input1,  const bool input2)
 	{
 		polen = input1;
 		
@@ -51,7 +51,7 @@ public:
 	{
 		return score;
 	}
-	void setPoints(int x)
+	void setPoints(const int x)
 	{
 		score = x;
 	}
@@ -64,7 +64,7 @@ public:
 	{
 		return hp;
 	}
-	void set_hp(int y)
+	void set_hp(const int y)
 	{
 		hp = y;
 	}

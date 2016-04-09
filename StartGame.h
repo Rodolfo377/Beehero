@@ -16,39 +16,15 @@
 #include "GameComponents.h"
 #include "Classes.h"
 
+
 /*The source code is adapted from a Udemy Course called 'Learn c++ game development' https://www.udemy.com/learn-c-game-development/
 in which the basic functionality of the SFML library is explored. However, this game has its own mechanics and art.*/
 
-/*
-class Variables
-{
-public:
-Elements el;
 
-bool collecting = false;
-bool stop = false;
-bool leave = false;
-
-void flower_in_smooth(int, int);
-void flower_out_smooth(int, int);
-void flower_stop();
-};
-
-*/
 
 class StartGame
 {
-	//function protoypes
-	/*void flower_in_smooth(const int, const int);
-	void flower_out_smooth(const int, const int);
-	void flower_stop();
-	void set_new_flower();
-	void create_drop();
-	void move_drop();
-	void take_damage();
-	bool detect_collision_water();
-	void blink_bee();
-	*/
+	
 
 	//Objects
 
@@ -79,94 +55,30 @@ class StartGame
 	sf::Sound hp_boost;
 	sf::Sound time_boost;
 
-	const int WIDTH = 1000;
-	const int HEIGHT = 600;
-
-
-
 	Bees bumbleBee;
-
-	bool collecting = false;
-	bool stop = false;
-	bool leave = false;
-
-
-
-
-
 	sf::Event event;
 
-	time_t end;
-	time_t beginning;
-
-
-
-	///////Variables
-	int beeXVelocity = 0;
-	int beeYVelocity = 0;
-	//tempX holds the temporary x coordinate of the flower that is available to be harvested
-	int tempX = 0;
-	//tempX holds the temporary y coordinate of the flower that is available to be harvested
-	int tempY = 0;
-	//index of the flower that is available
-	int flower_id = 0;
-	int times_stop = 0;
-	int space_count = 0;
-	int flower_available;
-	int polen_Score = 0;
-	int fly_counter = 0;
-	int health_points = 0;
-	//collision_counter variable determines how many times the function take_damage has been called, so it wont unnecessarily repeat its comands
-	int collision_counter = 0;
-	//blink variable determines how many times the bee has blinked - used in blink_bee() function
-	int blink = 0;
-	//speed of the bee, in pixels per iteration
-	int speed;
-	/*drop_strike holds the value related to the water drop that hit the player at a cetain moment
-	It is initialized as an invalid index, if compared to the vector of rainSprites that will be created.
-	There will be no more than two dozens of them at a time in the screen.*/
-	int drop_strike = 0;
-
-
-	//States
-
-	bool play = true;
-	bool gif_fly = true;
-	bool up = false;
-	bool down = false;
-	bool left = false;
-	bool right = false;
-	bool fly_left = false;
-	bool fly_right = true;
-	bool harvesting = false;
-	bool space = false;
-	bool show_bee = true;
-	//item_picked will indicate if the player has collected an item, and then it will play the proper sound effect to it
-	bool item_picked = false;
-	/*placed tells us if the random_place method has been called at least once, which will trigger specific collision
-	tests for the rain drop and the player, because from the moment there are items inside the rain drops,
-	it will have different effects on the player rather than just damage its health or making the bee lose
-	polen.
-	*/
-	bool placed = false;
-
-	//hurt tells if the bee was struck by a water drop
-	bool hurt = false;
-	bool invisible_drop = false;
-
+	
 
 	//vector that holds the water drops sprites that, when combined, will be the rain
 	std::vector<sf::Sprite> rain;
-	//array that holds the position index of the rain drop (from left to right) and the item index (see method place_item())
+
+	//arrays that holds the position index of the rain drop (from left to right) and the item index (see method place_item())
 	//and it does so for 3 different items: 3x2 = 6 places.
-	int water_item[6];
+	
+
+
+	//constants that will be used through the code
+	const int WIDTH = 1000;
+	const int HEIGHT = 600;
+	const int drops_number = 14;
 	int special_item[6];
 
 public:
 	StartGame()
 	{
 
-
+		
 
 		//Images
 
@@ -177,6 +89,8 @@ public:
 		//sets the rain drops to their default image
 		el.loadRain(0);
 		steady_rain.timeLimit = 15;
+
+
 		//Sound
 
 
@@ -204,19 +118,18 @@ public:
 
 		//Music
 
-		//Font
+		
 
-		speed = 3;
-
-		set_new_flower();
+		
 
 		game.timeLimit = 90;
 
-		el.loadScoreSprite(flower_available);
+		
 
 		rain.push_back(el.rainSprite);
 		r.timeLimit = 2;
 
+		
 		//garden[4] = { rose, violet, orchid, sunflower };
 		garden[0] = rose;
 		garden[1] = violet;
@@ -224,16 +137,84 @@ public:
 		garden[3] = sunflower;
 
 		char* flower_names[] = { "rose", "violet", "orchid", "sunflower" };
-
+		
 
 	}
 
-	bool gameLoop()
+	public: bool gameLoop()
 	{
-		sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "BeeHero");
+	
+		//States
+	
+		bool play = true;
+		bool gif_fly = true;
+		bool up = false;
+		bool down = false;
+		bool left = false;
+		bool right = false;
+		bool fly_left = false;
+		bool fly_right = true;
+		bool harvesting = false;
+		bool space = false;
+		bool show_bee = true;
+		//item_picked will indicate if the player has collected an item, and then it will play the proper sound effect to it
+		bool item_picked = false;
+		/*placed tells us if the random_place method has been called at least once, which will trigger specific collision
+		tests for the rain drop and the player, because from the moment there are items inside the rain drops,
+		it will have different effects on the player rather than just damage its health or making the bee lose
+		polen.
+		*/
+		bool placed = false;
 
+		//hurt tells if the bee was struck by a water drop
+		bool hurt = false;
+		bool invisible_drop = false;
+		bool first_loop = true;
+
+		bool collecting = false;
+		bool stop = false;
+		bool leave = false;
+
+
+		//Basic window setup
+		sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "BeeHero");
 		window.setFramerateLimit(60);
 		window.setKeyRepeatEnabled(false);
+
+
+		//speed of the bee, in pixels per iteration
+		int speed = 3;
+
+		/*drop_strike holds the value related to the water drop that hit the player at a cetain moment
+		It is initialized as an invalid index, if compared to the vector of rainSprites that will be created.
+		There will be no more than two dozens of them at a time in the screen.*/
+		int drop_strike = 0;
+
+
+		int beeXVelocity = 0;
+		int beeYVelocity = 0;
+		//tempX holds the temporary x coordinate of the flower that is available to be harvested
+		int tempX = 0;
+		//tempX holds the temporary y coordinate of the flower that is available to be harvested
+		int tempY = 0;
+		//index of the flower that is available (from 0 to 3)
+		int flower_id = 0;
+		int times_stop = 0;
+		int space_count = 0;
+		
+		int polen_Score = 0;
+		int fly_counter = 0;
+		int health_points = 0;
+		//collision_counter variable determines how many times the function take_damage has been called, so it wont unnecessarily repeat its comands
+		int collision_counter = 0;
+		//blink variable determines how many times the bee has blinked - used in blink_bee() function
+		int blink = 0;
+		int water_item[6];
+		
+		int flower_available = 0;
+		set_new_flower(flower_available);
+		el.loadScoreSprite(flower_available);
+
 		while (play == true)
 		{
 
@@ -259,13 +240,13 @@ public:
 				drop_strike = 0;
 				invisible_drop = false;
 				steady_rain.reset_timer();
-				for (int i = 0; i < rain.size(); i++)
+				for (int i = 1; i < rain.size(); i++)
 				{
-					rain[i].setPosition( i* 75, 0);
+					rain[i-1].setPosition( i* 75 - 10, 0);
 					/*sets all the sprites to the default image- so in case the player
 					reaches 100 points but loses it, the item wont be there again, but
 					the drops will all be reset to be empty once more*/
-					rain[i].setTexture(el.water_drop);
+					rain[i-1].setTexture(el.water_drop);
 				}
 				//places a special item inside a rain drop
 				if (bumbleBee.getPoints() > 30)
@@ -277,8 +258,8 @@ public:
 					for (int k = 0; k <= 5; k++)
 					{
 						water_item[k] = p[k];
-						std::cout << "\nwater_item[" << k << "] = " << water_item[k] << "\n";
-						std::cout << "p[" << k << "] = " << p[k] << "\n";
+						/*std::cout << "\nwater_item[" << k << "] = " << water_item[k] << "\n";
+						std::cout << "p[" << k << "] = " << p[k] << "\n";*/
 
 					}
 					placed = true;
@@ -289,12 +270,12 @@ public:
 
 			//Every 2 seconds loads a new rain drop sprite
 
-			if (rain.size() < 16)
+			if (rain.size() < drops_number)
 			{
 				create_drop();
 			}
 
-			move_drop();
+			move_drop(placed, speed);
 
 
 
@@ -389,9 +370,10 @@ public:
 			if (hurt == true)
 			{
 
-				blink_bee();
+				blink_bee(show_bee, blink);
 				//sets the timer to 2 seconds, that is how long the bee will move slower and blink
 				h.timeLimit = 2;
+				//slows the bee and the rain speed, giving a sense of slow-motion
 				speed = 1;
 
 				if (h.timer_check() <= 0){ hurt = false; h.reset_timer(); show_bee = true; }
@@ -454,13 +436,13 @@ public:
 			}
 
 			//Checks if a water drop hit a bee
-			if (detect_collision_water() == true)
+			if (detect_collision_water(drop_strike) == true)
 			{
 				invisible_drop = true;
 				/*assesses if the water drop that has collided with the player contains an item in it
 				or not, and decides what is the effect the water dorp has on the player depending on
 				the circumstances*/
-				take_damage();
+				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item);
 				/*if the collision has only been detected once and the water drop does not contain an item,
 				play a sound effect for being hit*/
 				if (collision_counter == 1 && item_picked == false)
@@ -469,7 +451,7 @@ public:
 				//resets the variable so the hit sound can be played again
 				item_picked = false;
 			}
-			if (detect_collision_water() == false)
+			if (detect_collision_water(drop_strike) == false)
 			{
 				collision_counter = 0;
 			}
@@ -507,24 +489,29 @@ public:
 
 					//Smooth placement onto the flower
 
-					flower_in_smooth(tempX, tempY);
+					flower_in_smooth(tempX, tempY, stop);
 				}
 				//Holds the bee on the flower while it collects pollen
 				if (stop == true)
 				{
-					flower_stop();
+					flower_stop(fly_right, times_stop, tempX, tempY);
 				}
 
 				//Smooth transition out of the flower
 				if (stop == false && leave == true)
 				{
-					flower_out_smooth(tempX, tempY);
+					flower_out_smooth(tempX, tempY, flower_id, flower_available, leave, collecting, speed);
 				}
 
 			}
 
-			//print rain array
-
+			//Checks if bee is inside the window boundaries
+			//x-axis, invert the current x velocity of the bee
+			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH - 30)
+				el.player1.move(-beeXVelocity, 0);
+			//y-axis
+			if (el.player1.getPosition().y < 0 || el.player1.getPosition().y > HEIGHT - 30)
+				el.player1.move(0, -beeYVelocity);
 
 			/****************Rendering******************/
 
@@ -569,15 +556,28 @@ public:
 			window.display();
 
 		}
-
+		
 		window.close();
 		//End game
 		return play;
 
 	}
 
+	/*controls the access to all of the following functions:
+	flower_in_smooth()
+	flower_stop()
+	flower_out_smooth()
+	set_new_flower()
+	create_drop()
+	move_drop()
+	detect_collision_water()
+	take_damage()
+	blink_bee()
+	place_item()
+	*/
+	private:
 
-	void flower_in_smooth(const int tempX, const int tempY)
+	void flower_in_smooth(const int tempX, const int tempY, bool &stop)
 	{
 
 		if (el.player1.getPosition().x < tempX + 20)
@@ -592,7 +592,7 @@ public:
 			stop = true;
 	}
 
-	void flower_stop()
+	void flower_stop(bool &fly_right, int &times_stop, const int &tempX, const int &tempY)
 	{
 		times_stop += 1;
 		fly_right = true;
@@ -601,7 +601,7 @@ public:
 
 	}
 
-	void flower_out_smooth(const int tempX, const int tempY)
+	void flower_out_smooth(const int tempX, const int tempY, int &flower_id,  int &flower_available, bool &leave, bool &collecting, const int &speed)
 	{
 		if (el.player1.getPosition().y >= tempY - 40)
 		{
@@ -619,11 +619,11 @@ public:
 			the next Scanning that finds a collision with one
 			of the flowers and the bee.*/
 			flower_id = 1000;
-			set_new_flower();
+			set_new_flower(flower_available);
 		}
 	}
 
-	void set_new_flower()
+	void set_new_flower(int &flower_available)
 	{
 		flower_available = game.random_n_generator(0, 4);
 		garden[flower_available].setValues(7, true);
@@ -645,12 +645,12 @@ public:
 		}
 		//places the last created drop at a specific place
 
-		rain[rain.size() - 1].setPosition( (rain.size()) * 75, 0);
+		rain[rain.size() - 1].setPosition( ((rain.size()) * 75)  - 10, 0);
 
 
 	}
 
-	void move_drop()
+	void move_drop(const bool &placed, const int &speed)
 	{
 		if (placed == false)
 		{
@@ -687,7 +687,7 @@ public:
 
 	}//move_drop()
 
-	bool detect_collision_water()
+	bool detect_collision_water(int &drop_strike)
 	{
 		bool wet = false;
 		for (int i = 0; i < rain.size(); i++)
@@ -705,7 +705,7 @@ public:
 	//If the bee gets hit by a water drop, its polen score gets reduced to 60% 
 	//of the previous value, and its health drops by half
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
-	void take_damage()
+	void take_damage(const bool &placed, bool &hurt, bool &item_picked, int &collision_counter, const int &drop_strike, const int *p)
 	{
 		collision_counter++;
 
@@ -729,11 +729,11 @@ public:
 				//tests if the bee was struck by a drop containing an item
 				for (int i = 0; i < 6; i += 2)
 				{
-					if (drop_strike == water_item[i])
+					if (drop_strike == p[i])
 					{
 						item_picked = true;
 						//if so, checks what item is it and then decides what the response is going to be
-						switch (water_item[i + 1])
+						switch (p[i + 1])
 						{
 						case 1://death item
 							//wipes out the bumblebee's entire health
@@ -758,7 +758,7 @@ public:
 					}//closes drop_strike if
 
 					//if there was a collision, and no item has already been taken, it must be an empty drop, so it will hurt the bee 
-					if (drop_strike != water_item[i] && item_picked == false && yes_it_hurt == false)
+					if (drop_strike != p[i] && item_picked == false && yes_it_hurt == false)
 					{
 						yes_it_hurt = true;
 						int p = bumbleBee.getPoints();
@@ -774,7 +774,7 @@ public:
 		}
 	}
 
-	void blink_bee()
+	void blink_bee( bool &show_bee, int &blink)
 	{
 		blink++;
 
@@ -785,18 +785,28 @@ public:
 		else{ show_bee = false; }
 	}
 
-	//after the player has scored enough points, random items may be found inside the one of the rain drops
+	/*after the player has scored enough points, random items may be found inside the one of the rain drops
+	//this function will place a random item inside a water drop from the 4th to the 10th rain array elements, from left to right
+	//Also, two pre-defined items (purple death skull) will be located at each side of the random item.
+	
+	The function starts by placing the random item (time boost, health boost, or death skull), identified by the parameter 'itemcode'*/
 	int * place_item(int itemcode)
 	{
+		itemcode = 0;
 		int item_id = 0, drop_id = 0;
+		
+
 		while (itemcode <= 4)
 		{
 			//if the parameter is 0, a random item will be placed at a random place
 			if (itemcode == 0)
 			{
 				//sets the rain drop in which the item is going to be in  random fashion
-				drop_id = game.random_n_generator(0, 9);
-
+				//designed to be located as centre as possible (i.e., close to the flowers and the player)
+				//int limit = drops_number - 4;
+				drop_id = game.random_n_generator(3, 6);
+				
+				std::cout << "drop_id: " << drop_id << std::endl;
 				//sets the item that is going to be displayed inside the chosen rain drop
 				item_id = game.random_n_generator(1, 3);
 			}
@@ -812,7 +822,7 @@ public:
 
 				if (itemcode == 2)
 				{
-					if (drop_id < 9)
+					if (drop_id < drops_number-1)
 						drop_id = temp_id + 1;
 				}
 				if (itemcode == 4)
