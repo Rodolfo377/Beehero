@@ -42,10 +42,11 @@ class Bees
 private:
 	int score = 0;
 	int hp = 10;
+	int lives = 1;
 public:
-	void add_points()
+	void add_points(const int plus)
 	{
-		score++;
+		score += plus;
 	}
 	int getPoints()
 	{
@@ -56,9 +57,9 @@ public:
 		score = x;
 	}
 
-	void add_hp()
+	void add_hp(const int x)
 	{
-		hp++;
+		hp += x;
 	}
 	int get_hp()
 	{
@@ -68,7 +69,15 @@ public:
 	{
 		hp = y;
 	}
-	
+	//adds or takes lives
+	void alter_lives(const int offset)
+	{
+		lives += offset;
+	}
+	int getLives()
+	{
+		return lives;
+	}
 
 };
 

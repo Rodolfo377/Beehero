@@ -49,11 +49,13 @@ class StartGame
 	sf::SoundBuffer waterBuffer;
 	sf::SoundBuffer hpBoostBuffer;
 	sf::SoundBuffer timeBoostBuffer;
+	sf::SoundBuffer LifeUpBuffer;
 
 	sf::Sound collect;
 	sf::Sound hit;
 	sf::Sound hp_boost;
 	sf::Sound time_boost;
+	sf::Sound lifeUp;
 
 	Bees bumbleBee;
 	sf::Event event;
@@ -63,16 +65,16 @@ class StartGame
 	//vector that holds the water drops sprites that, when combined, will be the rain
 	std::vector<sf::Sprite> rain;
 
-	//arrays that holds the position index of the rain drop (from left to right) and the item index (see method place_item())
+	//array that holds the position index of the rain drop (from left to right) and the item index (see method place_item())
 	//and it does so for 3 different items: 3x2 = 6 places.
-	
+	int special_item[6];
 
 
 	//constants that will be used through the code
 	const int WIDTH = 1000;
 	const int HEIGHT = 600;
 	const int drops_number = 14;
-	int special_item[6];
+	
 
 public:
 	StartGame()
@@ -110,12 +112,16 @@ public:
 		{
 			std::cout << "'time_boost.wav' not found...\n";
 		}
+		if (LifeUpBuffer.loadFromFile("Sound/life_up.wav") == 0)
+		{
+			std::cout << "'life_up.wav' not found...\n";
+		}
 
 		collect.setBuffer(collectBuffer);
 		hit.setBuffer(waterBuffer);
 		hp_boost.setBuffer(hpBoostBuffer);
 		time_boost.setBuffer(timeBoostBuffer);
-
+		lifeUp.setBuffer(LifeUpBuffer);
 		//Music
 
 		
@@ -141,9 +147,9 @@ public:
 
 	}
 
-	public: bool gameLoop()
+	public: bool gameLoop(int stage)
 	{
-	
+	 
 		//States
 	
 		bool play = true;
@@ -183,7 +189,7 @@ public:
 
 
 		//speed of the bee, in pixels per iteration
-		int speed = 3;
+		int speed = 2;
 
 		/*drop_strike holds the value related to the water drop that hit the player at a cetain moment
 		It is initialized as an invalid index, if compared to the vector of rainSprites that will be created.
@@ -209,6 +215,9 @@ public:
 		int collision_counter = 0;
 		//blink variable determines how many times the bee has blinked - used in blink_bee() function
 		int blink = 0;
+
+		//array that holds the position index of the rain drop (from left to right) and the item index (see method place_item())
+		//and it does so for 3 different items: 3x2 = 6 places.
 		int water_item[6];
 		
 		int flower_available = 0;
@@ -224,6 +233,7 @@ public:
 			health_points = bumbleBee.get_hp();
 			el.loadScore(polen_Score);
 			el.load_hp(health_points);
+			el.load_lives(bumbleBee.getLives());
 			/*polen_Score = bumbleBee.getPoints();
 			el.loadFont(polen_Score, el.points, 600, 10, 30);*/
 
@@ -252,7 +262,7 @@ public:
 				if (bumbleBee.getPoints() > 30)
 				{
 					int *p;
-					p = place_item(0);
+					p = place_item();
 
 					//copies the values from the array yielded by the method place_item() into water_item
 					for (int k = 0; k <= 5; k++)
@@ -328,7 +338,7 @@ public:
 					if (stop == true)
 					{
 						garden[flower_available].harvest();
-						bumbleBee.add_points();
+						bumbleBee.add_points(1*stage);
 						harvesting = true;
 						el.loadScoreSprite(flower_available);
 						collect.play();
@@ -381,7 +391,7 @@ public:
 
 			if (hurt == false)
 			{
-				speed = 3;
+				speed = 2*stage;
 			}
 			el.player1.move(beeXVelocity, beeYVelocity);
 
@@ -531,6 +541,7 @@ public:
 			window.draw(el.timer);
 			window.draw(el.points);
 			window.draw(el.health);
+			window.draw(el.lives);
 
 			for (int i = 0; i < rain.size(); i++)
 			{
@@ -592,7 +603,7 @@ public:
 			stop = true;
 	}
 
-	void flower_stop(bool &fly_right, int &times_stop, const int &tempX, const int &tempY)
+	void flower_stop(bool &fly_right, int &times_stop, const int tempX, const int tempY)
 	{
 		times_stop += 1;
 		fly_right = true;
@@ -601,7 +612,7 @@ public:
 
 	}
 
-	void flower_out_smooth(const int tempX, const int tempY, int &flower_id,  int &flower_available, bool &leave, bool &collecting, const int &speed)
+	void flower_out_smooth(const int tempX, const int tempY, int &flower_id,  int &flower_available, bool &leave, bool &collecting, const int speed)
 	{
 		if (el.player1.getPosition().y >= tempY - 40)
 		{
@@ -650,7 +661,7 @@ public:
 
 	}
 
-	void move_drop(const bool &placed, const int &speed)
+	void move_drop(const bool placed, const int speed)
 	{
 		if (placed == false)
 		{
@@ -705,7 +716,7 @@ public:
 	//If the bee gets hit by a water drop, its polen score gets reduced to 60% 
 	//of the previous value, and its health drops by half
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
-	void take_damage(const bool &placed, bool &hurt, bool &item_picked, int &collision_counter, const int &drop_strike, const int *p)
+	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p)
 	{
 		collision_counter++;
 
@@ -713,6 +724,7 @@ public:
 		{
 			if (placed == false)
 			{
+
 
 				int p = bumbleBee.getPoints();
 				bumbleBee.setPoints(p*0.6);
@@ -736,15 +748,33 @@ public:
 						switch (p[i + 1])
 						{
 						case 1://death item
-							//wipes out the bumblebee's entire health
-							bumbleBee.set_hp(0);
+							//wipes out the bumblebee's life
+							bumbleBee.alter_lives(-1);
+							//resets the hp to maximum
+							bumbleBee.set_hp(10);
+							//if it was the bee's last life, it perishes
+							if (bumbleBee.getLives() == 0)
+								bumbleBee.set_hp(0);
 							std::cout << "Died! \n";
 							break;
 						case 2://heart item
-							//restores the bumblebee's health completely
-							bumbleBee.set_hp(10);
+							//Adds 5 to the bumblebee's hp
+							if (bumbleBee.get_hp() + 5 <= 10)
+							{
+								bumbleBee.add_hp(5);
+								hp_boost.play();
+							}
+							/*However, if the bee is left with over 10 hp it will be automatically set to 10 again and the player will
+							//be awarded with an extra life instead*/
+							else if (bumbleBee.get_hp()+5 > 10)
+							{
+								bumbleBee.set_hp(10);
+								bumbleBee.alter_lives(1);
+								//load triumph sound
+								lifeUp.play();
+							}
 							//plays a specific sound effect 
-							hp_boost.play();
+							
 							break;
 						case 3://time item
 							//gives the player 15 more seconds of play
@@ -776,6 +806,7 @@ public:
 
 	void blink_bee( bool &show_bee, int &blink)
 	{
+		
 		blink++;
 
 		if (blink % 3 == 0)
@@ -790,9 +821,9 @@ public:
 	//Also, two pre-defined items (purple death skull) will be located at each side of the random item.
 	
 	The function starts by placing the random item (time boost, health boost, or death skull), identified by the parameter 'itemcode'*/
-	int * place_item(int itemcode)
+	int * place_item()
 	{
-		itemcode = 0;
+		int itemcode = 0;
 		int item_id = 0, drop_id = 0;
 		
 

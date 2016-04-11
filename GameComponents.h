@@ -53,6 +53,7 @@ public:
 	sf::Text timer;
 	sf::Text points;
 	sf::Text health;
+	sf::Text lives;
 
 	sf::Sprite sprite_score;
 
@@ -267,6 +268,20 @@ public:
 
 		health.setPosition(800, 10);
 
+	}
+
+	void load_lives(int l)
+	{
+		std::string soul;
+		std::ostringstream translate;
+		translate << l;
+		soul = translate.str();
+
+		lives.setFont(font);
+		lives.setCharacterSize(30);
+		lives.setString("Lives: " + soul);
+
+		lives.setPosition(900, 10);
 	}
 
 
