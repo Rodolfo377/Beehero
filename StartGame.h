@@ -90,7 +90,7 @@ public:
 		el.load_player1();
 		//sets the rain drops to their default image
 		el.loadRain(0);
-		steady_rain.timeLimit = 15;
+		
 
 
 		//Sound
@@ -224,6 +224,9 @@ public:
 		set_new_flower(flower_available);
 		el.loadScoreSprite(flower_available);
 
+		//The more advanced the stage, the more frequently rain is going to fall
+		steady_rain.timeLimit = 15 / stage;
+		
 		while (play == true)
 		{
 
@@ -837,7 +840,7 @@ public:
 				//int limit = drops_number - 4;
 				drop_id = game.random_n_generator(3, 6);
 				
-				std::cout << "drop_id: " << drop_id << std::endl;
+		
 				//sets the item that is going to be displayed inside the chosen rain drop
 				item_id = game.random_n_generator(1, 3);
 			}
@@ -886,4 +889,18 @@ public:
 		return special_item;
 	}
 
+	public:
+
+	int getBeeLives()
+	{
+		return bumbleBee.getLives();
+	}
+	int getBeePolen()
+	{
+		return bumbleBee.getPoints();
+	}
+	int getBeeHP()
+	{
+		return bumbleBee.get_hp();
+	}
 };

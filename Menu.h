@@ -26,7 +26,7 @@ class Menu
 	sf::Sound click;
 	sf::SoundBuffer sel_menu;
 	sf::SoundBuffer cli_menu;
-	
+	int button_id = -1;
 
 
 public:
@@ -125,16 +125,20 @@ public:
 					{
 						
 					case 0://player clicked on the Play button
-						std::cout << "player clicked on the Play button\n";
+						set_button_clicked(0);
+						window.close();
 						break;
 					case 1://player clicked on the Tutorial button
-						std::cout << "player clicked on the Tutorial button\n";
+						set_button_clicked(1);
+						window.close();
 						break;
 					case 2://player clicked on the Ranking button
-						std::cout << "player clicked on the Ranking button\n";
+						set_button_clicked(2);
+						window.close();
 						break;
 					case 3://player clicked on the Quit button
-						std::cout << "player clicked on the Quit button\n";
+						set_button_clicked(3);
+						window.close();
 						break;
 					default:
 						break;
@@ -159,7 +163,7 @@ public:
 		}
 	}
 
-
+	private: 
 	void loadImages()
 	{
 	
@@ -219,7 +223,7 @@ public:
 	{
 		std::cout << "\n\n";
 		int chosen = -1;
-		sf::Mouse cursor;
+		
 		//positions_array[] will hold the x and y coordinates of the 4 menu items in the following fashion:
 		//(x1,y1,x2,y2,x3,y3,x4,y4)
 		int positions_array[8];
@@ -246,5 +250,17 @@ public:
 		}
 
 		return chosen;
+	}
+
+	void set_button_clicked(int x)
+	{
+		button_id = x;
+	}
+
+	public:
+	int get_button_clicked()
+	{
+		
+		return button_id;
 	}
 };

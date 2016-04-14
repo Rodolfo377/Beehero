@@ -128,9 +128,9 @@ public:
 			std::cout << "Could not find 'bee_worker_flying_2_left.png' image...\n";
 		}
 
-		if (painting.loadFromFile("Images/Scenario/Background/landscape under stormy sky .png") == false)
+		if (painting.loadFromFile("Images/Scenario/Background/landscape_under_stormy_sky.png") == false)
 		{
-			std::cout << "Could not find 'landscape under stormy sky .png' image...\n";
+			std::cout << "Could not find 'landscape_under_stormy_sky.png' image...\n";
 		}
 
 		if (mission_background.loadFromFile("Images/Scenario/background/MahGrassField.png") == false)
@@ -224,6 +224,8 @@ public:
 		return player1;
 	}
 
+	/*loadTimer() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
+	//To be printed on the screen*/
 	void loadTimer(int sec)
 	{
 		std::string seconds;
@@ -234,12 +236,13 @@ public:
 		
 		
 		timer.setFont(font);
-		timer.setCharacterSize(30);
+		timer.setCharacterSize(20);
 		timer.setString("Time: "+seconds+"s");
 
-		timer.setPosition(400, 10);
+		timer.setPosition(300, 10);
 	}
-	//loads the most recent score on the screen as a Text
+	/*loaadScore() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
+	//To be printed on the screen*/
 	void loadScore(int n)
 	{
 		std::string score;
@@ -250,11 +253,13 @@ public:
 
 
 		points.setFont(font);
-		points.setCharacterSize(30);
-		points.setString("Score: "+score);
+		points.setCharacterSize(20);
+		points.setString(" Score:"+score);
 
-		points.setPosition(600, 10);
+		points.setPosition(500, 10);
 	}
+	/*load_hp() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
+	//To be printed on the screen*/
 	void load_hp(int m)
 	{
 		std::string life;
@@ -263,13 +268,14 @@ public:
 		life = translate.str();
 
 		health.setFont(font);
-		health.setCharacterSize(30);
-		health.setString("HP: "+life);
+		health.setCharacterSize(20);
+		health.setString(" HP:"+life);
 
-		health.setPosition(800, 10);
+		health.setPosition(700, 10);
 
 	}
-
+	/*load_lives() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
+	//To be printed on the screen*/
 	void load_lives(int l)
 	{
 		std::string soul;
@@ -278,10 +284,10 @@ public:
 		soul = translate.str();
 
 		lives.setFont(font);
-		lives.setCharacterSize(30);
-		lives.setString("Lives: " + soul);
+		lives.setCharacterSize(20);
+		lives.setString(" Lives:" + soul);
 
-		lives.setPosition(900, 10);
+		lives.setPosition(820, 10);
 	}
 
 
