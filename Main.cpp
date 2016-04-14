@@ -1,9 +1,19 @@
 #include "Base.h"
 #include "StartGame.h"
+#include "Menu.h"
 
 int main()
 {
+	
+	Menu myMenu;
+	int i = 0;
+
+
+	
+	/*
+	//Play 
 	//One object for each stage of the game
+
 	StartGame start[3];
 
 	//Splash screen
@@ -22,7 +32,7 @@ int main()
 	}
 	//special stage ... Bet yOu wOnt diScover...
 	
-
+	*/
 	//Update high score
 
 	return 0;

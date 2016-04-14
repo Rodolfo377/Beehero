@@ -139,9 +139,9 @@ public:
 		}
 
 		//Font
-		if (font.loadFromFile("Fonts/arial.ttf") == 0)
+		if (font.loadFromFile("Fonts/PressStart2P.ttf") == 0)
 		{
-			std::cout << "Could not find 'arial.ttf font...\n";
+			std::cout << "Could not find 'PressStart2P.ttf font...\n";
 		}
 
 		//Sprites
