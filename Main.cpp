@@ -2,11 +2,12 @@
 #include "Menu.h"
 #include "SplashScreen.h"
 #include "HoneyScore.h"
+#include "Ranking.h"
 
 int main()
 {
 	SplashScreen splash;
-
+	//Honey points is the total amount of honey that has been collected on all the stages played
 	int honeyPoints = 0;
 	Menu myMenu;
 	int choice = myMenu.get_button_clicked();
@@ -43,9 +44,9 @@ int main()
 
 			int round_score = hp*lives*polen;
 
-			/*std::cout << "hp: " << hp << " lives: " << lives << " polen: " << polen << "this round's score: " << round_score;
+			
 			honeyPoints += round_score;
-			std::cout << "\n***********Honey Points in round " << i << ": " << honeyPoints << "***********\n";*/
+			
 
 			HoneyScore hs(hp, lives, polen);
 
@@ -73,6 +74,7 @@ int main()
 	
 	*/
 	//Update high score
+	Ranking r(honeyPoints);
 
 	return 0;
 }

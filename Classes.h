@@ -81,17 +81,22 @@ public:
 
 };
 
+
+/*Class Window includes a set of methods and variables that are very useful building a window.
+For example, method 'write' takes a string and integer values as coordinates in order to place 
+a Text object in the window */
 class Window
 {
 protected:
 	sf::Font pixel8bit;
 	sf::Text pressKey;
 	Methods blink;
-	bool visible = false;
+	bool visible;
 
 	Window()
 	{
-		
+		visible = false;
+		loadFont();
 	}
 	
 
@@ -117,7 +122,7 @@ protected:
 
 	}
 
-protected:
+
 	void blink_item()
 	{
 		if (blink.timer_check() <= 1)
