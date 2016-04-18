@@ -90,7 +90,7 @@ public:
 			if (item_id != -1)
 			{
 				select_counter++;
-				message[item_id].setColor(sf::Color::White);
+				message[item_id].setColor(sf::Color::Magenta);
 				if (select_counter == 1)
 				{
 					//play select_menu.wav
@@ -203,6 +203,7 @@ public:
 		{
 			std::cout << "Could not find 'PressStart2P.ttf font...\n";
 		}
+		
 	}
 
 	//write() does the basic configuration to a given Text object, given by a string.
@@ -212,9 +213,7 @@ public:
 		message[n].setCharacterSize(20);
 		message[n].setString(str);
 		message[n].setPosition(x, y);
-		message[n].setColor(sf::Color::Black);
-
-		
+				
 	}
 	//this function will return -1 unless the cursor is positioned over the menu items
 	//When the cursor is hovering a menu item, the function will return and integer from 0 to 3 corresponding

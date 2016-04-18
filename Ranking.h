@@ -69,7 +69,7 @@ private:
 
 		//copies the values of one array to the other
 		for (int i = 0; i < R_SIZE; i++)
-		*(copy_original+i) = *(score_array+i);
+			*(copy_original + i) = *(score_array + i);
 
 		int i = 0;
 		int index = 0;
@@ -79,28 +79,33 @@ private:
 		//Loop looks for the first element of the original array that is lower than the newest 
 		//score and save that element's position as 'index', then it replaces the original element by the newest at the 
 		//'index' value (that is, the first replacement already takes place in this loop)
-			while (i < R_SIZE)
+		while (i < R_SIZE)
+		{
+			std::cout << "first loop\n";
+			if (newScore > *(score_array + i))
 			{
-				std::cout << "first loop\n";
-				if (newScore > *(score_array + i))
-				{
-					index = i;
-					//Makes sure the next loop wont happen
-					i = 1000;
-					score_array[index] = newScore;
-				}
-				i++;
+				index = i;
+				//Makes sure the next loop wont happen
+				i = 1000;
+				score_array[index] = newScore;
 			}
 
-			for (int i = 0; i < R_SIZE; i++)
-				std::cout << score_array[i] << "\n";
-			for (int i = 0; i < R_SIZE; i++)
-				std::cout << copy_original[i] << "\n";
+			i++;
+		}
 
+		for (int i = 0; i < R_SIZE; i++)
+			std::cout << score_array[i] << "\n";
+		for (int i = 0; i < R_SIZE; i++)
+			std::cout << copy_original[i] << "\n";
+
+		//If the new score is actually greater than at least the last on the top 5
+		if (newScore > *(score_array + (R_SIZE - 1)))
+		{
 			//This loop updates the rest of the high scores array, if the new score is not the least among the top scores
 			while (index < R_SIZE - 1)
 			{
 				std::cout << "second  loop\n";
+
 
 				score_array[index + 1] = copy_original[index];
 				for (int i = 0; i < R_SIZE; i++)
@@ -111,11 +116,13 @@ private:
 				std::cout << "\n\n";
 				index++;
 			}
+
 			for (int i = 0; i < R_SIZE; i++)
 				std::cout << score_array[i] << "\n";
 
 			return score_array;
-		
+
+		}
 	}
 	   
 };

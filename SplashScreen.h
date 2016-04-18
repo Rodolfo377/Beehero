@@ -37,7 +37,8 @@ public:
 		loadImage();
 		blink.timeLimit = 2;
 
-		pressKey = write("PRESS ANY KEY TO START", WIDTH/4, HEIGHT*0.8);
+		pressKey = write("PRESS ANY KEY TO START", WIDTH/5, HEIGHT*0.8);
+		pressKey.setCharacterSize(30);
 
 		while (window.isOpen())
 		{
@@ -75,7 +76,7 @@ public:
 private:
 	void loadImage()
 	{
-		if (firstImage.loadFromFile("Images/Scenario/Splash/splash_screen.png") == 0)
+		if (firstImage.loadFromFile("Images/Scenario/Splash/Retro_SplashScreen.png") == 0)
 		{
 			std::cout << "Splash Screen not found...\n";
 		}

@@ -116,7 +116,7 @@ protected:
 		text.setCharacterSize(20);
 		text.setString(str);
 		text.setPosition(x, y);
-		text.setColor(sf::Color::Magenta);
+		text.setColor(sf::Color::Color(128,7,142,255));
 
 		return text;
 
