@@ -32,7 +32,7 @@ class Menu
 public:
 	Menu()
 	{
-		sf::RenderWindow window(sf::VideoMode(1000, 600), "SFML works!");
+		sf::RenderWindow window(sf::VideoMode(1000, 600), "Menu");
 		window.setFramerateLimit(60);
 
 		sf::Event event;
@@ -206,7 +206,7 @@ public:
 	}
 
 	//write() does the basic configuration to a given Text object, given by a string.
-	sf::Text write(std::string str, int n, int x, int y)
+	void write(std::string str, int n, int x, int y)
 	{
 		message[n].setFont(pixel8bit);
 		message[n].setCharacterSize(20);
@@ -214,7 +214,7 @@ public:
 		message[n].setPosition(x, y);
 		message[n].setColor(sf::Color::Black);
 
-		return message[n];
+		
 	}
 	//this function will return -1 unless the cursor is positioned over the menu items
 	//When the cursor is hovering a menu item, the function will return and integer from 0 to 3 corresponding
@@ -231,8 +231,8 @@ public:
 		//intializes the array members to the relative cordinates of the Text objects that colntain the menu items
 		for (int i = 0; i < SIZE; i++)
 		{
-			positions_array[2*i] = message[i].getPosition().x;
-			positions_array[2*i+1] = message[i].getPosition().y;
+			positions_array[2*i] = (int)message[i].getPosition().x;
+			positions_array[2*i+1] = (int)message[i].getPosition().y;
 			//std::cout << positions_array[2 * i] << " " << positions_array[2 * i + 1] << "\n";
 		}
 

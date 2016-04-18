@@ -81,3 +81,54 @@ public:
 
 };
 
+class Window
+{
+protected:
+	sf::Font pixel8bit;
+	sf::Text pressKey;
+	Methods blink;
+	bool visible = false;
+
+	Window()
+	{
+		
+	}
+	
+
+	void loadFont()
+	{
+		if (pixel8bit.loadFromFile("Fonts/PressStart2P.ttf") == 0)
+		{
+			std::cout << "Could not find 'PressStart2P.ttf font...\n";
+		}
+	}
+
+	sf::Text write(std::string str, int x, int y)
+	{
+
+		sf::Text text;
+		text.setFont(pixel8bit);
+		text.setCharacterSize(20);
+		text.setString(str);
+		text.setPosition(x, y);
+		text.setColor(sf::Color::Magenta);
+
+		return text;
+
+	}
+
+protected:
+	void blink_item()
+	{
+		if (blink.timer_check() <= 1)
+		{
+			visible = false;
+		}
+		if (blink.timer_check() <= 0)
+		{
+			visible = true;
+			blink.reset_timer();
+		}
+	}
+};
+

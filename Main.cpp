@@ -1,11 +1,16 @@
 #include "StartGame.h"
 #include "Menu.h"
+#include "SplashScreen.h"
+#include "HoneyScore.h"
 
 int main()
 {
+	SplashScreen splash;
+
 	int honeyPoints = 0;
 	Menu myMenu;
 	int choice = myMenu.get_button_clicked();
+	int response = 0;
 
 	while (choice == -1)
 	{
@@ -26,7 +31,7 @@ int main()
 
 		while (i <= 2)
 		{
-			while (start[i].gameLoop(i+1) == true)
+			while (start[i].gameLoop(i + 1) == true)
 			{
 				;
 			}
@@ -35,12 +40,18 @@ int main()
 			int hp = start[i].getBeeHP();
 			int lives = start[i].getBeeLives();
 			int polen = start[i].getBeePolen();
+
 			int round_score = hp*lives*polen;
-			std::cout << "hp: " << hp << " lives: " << lives << " polen: " << polen << "this round's score: " << round_score;
+
+			/*std::cout << "hp: " << hp << " lives: " << lives << " polen: " << polen << "this round's score: " << round_score;
 			honeyPoints += round_score;
-			std::cout << "\n***********Honey Points in round " << i << ": " << honeyPoints << "***********\n";
+			std::cout << "\n***********Honey Points in round " << i << ": " << honeyPoints << "***********\n";*/
+
+			HoneyScore hs(hp, lives, polen);
+
 			i++;
 		}
+		
 	}
 
 	//Tutorial

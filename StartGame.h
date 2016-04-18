@@ -15,6 +15,13 @@
 #include <SFML/Graphics/Image.hpp>
 #include "GameComponents.h"
 #include "Classes.h"
+#ifndef WIDTH
+#define WIDTH 1000
+#endif
+#ifndef HEIGHT
+#define HEIGHT 600
+#endif
+
 
 
 /*The source code is adapted from a Udemy Course called 'Learn c++ game development' https://www.udemy.com/learn-c-game-development/
@@ -71,8 +78,7 @@ class StartGame
 
 
 	//constants that will be used through the code
-	const int WIDTH = 1000;
-	const int HEIGHT = 600;
+
 	const int drops_number = 14;
 	
 
@@ -225,7 +231,7 @@ public:
 		el.loadScoreSprite(flower_available);
 
 		//The more advanced the stage, the more frequently rain is going to fall
-		steady_rain.timeLimit = 15 / stage;
+		steady_rain.timeLimit = 20 / stage;
 		
 		while (play == true)
 		{
@@ -246,10 +252,10 @@ public:
 				play = false;
 			}
 
-			//makes it rain again every 15 seconds, after 20 seconds have passed
-			if (game.timer_check() < 70 && steady_rain.timer_check() <= 0)
+			//makes it rain again every 15, 10 or 5 seconds seconds, after 20 seconds have passed
+			if (game.timer_check() < 65 && steady_rain.timer_check() <= 0)
 			{
-
+				
 				drop_strike = 0;
 				invisible_drop = false;
 				steady_rain.reset_timer();
@@ -758,7 +764,7 @@ public:
 							//if it was the bee's last life, it perishes
 							if (bumbleBee.getLives() == 0)
 								bumbleBee.set_hp(0);
-							std::cout << "Died! \n";
+							//std::cout << "Died! \n";
 							break;
 						case 2://heart item
 							//Adds 5 to the bumblebee's hp

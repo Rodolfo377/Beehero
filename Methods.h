@@ -5,9 +5,9 @@
 random_n_generator(): yields a random number given a certain start point 
 and total number of integers to be picked from. 
 
-timer_check(): once the player has given a certain timer, this method will 
+timer_check(): once the player has given a certain timer- in seconds- this method will 
 calculate if the time is up and return the amount of time left, so when it is equal to 
-zero the code will trigger a response in the game.
+zero or a certain value the code will trigger a response in the game.
 
 reset_timer(): resets the timer so it can be used again
 
