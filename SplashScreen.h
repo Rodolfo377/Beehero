@@ -13,9 +13,9 @@
 #endif
 
 
-class SplashScreen:public Window
+class SplashScreen:public StandartWindow
 {
-protected:
+private:
 	sf::Texture firstImage;
 	sf::RectangleShape firstWindow;
 
@@ -35,6 +35,7 @@ public:
 
 		loadFont();
 		loadImage();
+		loadTitle();
 		blink.timeLimit = 2;
 
 		pressKey = write("PRESS ANY KEY TO START", WIDTH/5, HEIGHT*0.8);
@@ -59,6 +60,7 @@ public:
 			blink_item();
 			//Render
 			window.clear();
+			window.draw(background);
 			window.draw(firstWindow);
 			
 			if (visible == true)
@@ -66,7 +68,7 @@ public:
 				window.draw(pressKey);
 			}
 			
-			//Makes the Text appear and disappear every second, giving a sense o blinking
+			
 			
 
 			window.display();
@@ -74,7 +76,7 @@ public:
 	}
 
 private:
-	void loadImage()
+	void loadTitle()
 	{
 		if (firstImage.loadFromFile("Images/Scenario/Splash/Retro_SplashScreen.png") == 0)
 		{

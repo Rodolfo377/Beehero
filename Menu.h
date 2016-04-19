@@ -4,6 +4,14 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 #include <string>
+
+#ifndef WIDTH
+#define WIDTH 1000
+#endif
+#ifndef HEIGHT
+#define HEIGHT 600
+#endif
+
 #ifndef SIZE
 #define SIZE 4
 #endif

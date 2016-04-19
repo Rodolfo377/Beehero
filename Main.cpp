@@ -13,6 +13,7 @@ int main()
 	int choice = myMenu.get_button_clicked();
 	int response = 0;
 
+	
 	while (choice == -1)
 	{
 		;
@@ -48,7 +49,7 @@ int main()
 			honeyPoints += round_score;
 			
 
-			HoneyScore hs(hp, lives, polen);
+			HoneyScore hs(hp, lives, polen, honeyPoints);
 
 			i++;
 		}
@@ -63,6 +64,8 @@ int main()
 	else if (choice == 2)
 	{
 		std::cout << "player clicked on the Ranking button\n";
+		Ranking r(honeyPoints);
+		
 	}
 	else if (choice == 3)
 	{
@@ -74,7 +77,7 @@ int main()
 	
 	*/
 	//Update high score
-	Ranking r(honeyPoints);
+	
 
 	return 0;
 }

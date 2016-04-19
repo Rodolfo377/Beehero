@@ -203,7 +203,7 @@ public:
 
 	void load_background()
 	{
-		background.setSize(sf::Vector2f(WIDTH, HEIGHT));
+		background.setSize(sf::Vector2f((float)WIDTH, (float)HEIGHT));
 		background.setPosition(0, 0);
 		background.setTexture(&mission_background);
 	}
@@ -314,9 +314,9 @@ public:
 	{
 		//sprite_score.setSize(sf::Vector2f(30, 30));		
 		sprite_score.setTexture(plus_one);
-		tempXflower = flowers[flower_index].getPosition().x + 50;
-		tempYflower = flowers[flower_index].getPosition().y;
-		sprite_score.setPosition(tempXflower, tempYflower);
+		tempXflower = (int)flowers[flower_index].getPosition().x + 50;
+		tempYflower = (int)flowers[flower_index].getPosition().y;
+		sprite_score.setPosition((int)tempXflower, (int)tempYflower);
 		//std::cout << "tempXflower: " << tempXflower << " tempYflower: " << tempYflower <<"\n";
 		
 	}
@@ -350,7 +350,7 @@ public:
 
 	void rainPosition(int x, int y)
 	{
-		rainSprite.setPosition(x, y);
+		rainSprite.setPosition((int)x,(int)y);
 	}
 	//make the rectangle container move downwards by 1 pixel everytime it is called , simulating rain
 	

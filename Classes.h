@@ -1,6 +1,13 @@
 #include <time.h>
 #include <iostream>
 #include "Methods.h"
+#ifndef WIDTH
+#define WIDTH 1000
+#endif
+#ifndef HEIGHT
+#define HEIGHT 600
+#endif
+
 
 class Flowers
 {
@@ -85,15 +92,17 @@ public:
 /*Class Window includes a set of methods and variables that are very useful building a window.
 For example, method 'write' takes a string and integer values as coordinates in order to place 
 a Text object in the window */
-class Window
+class StandartWindow
 {
 protected:
 	sf::Font pixel8bit;
 	sf::Text pressKey;
 	Methods blink;
 	bool visible;
+	sf::Texture pixel_honey_comb;
+	sf::RectangleShape background;
 
-	Window()
+	StandartWindow()
 	{
 		visible = false;
 		loadFont();
@@ -115,14 +124,14 @@ protected:
 		text.setFont(pixel8bit);
 		text.setCharacterSize(20);
 		text.setString(str);
-		text.setPosition(x, y);
+		text.setPosition((int)x, (int)y);
 		text.setColor(sf::Color::Color(128,7,142,255));
 
 		return text;
 
 	}
 
-
+	//Makes the Text appear and disappear every second, giving a sense of blinking
 	void blink_item()
 	{
 		if (blink.timer_check() <= 1)
@@ -134,6 +143,31 @@ protected:
 			visible = true;
 			blink.reset_timer();
 		}
+	}
+
+	//converts from int to string
+	std::string convert(std::string description, int n)
+	{
+		/*the convertion has been adapted from http://www.cplusplus.com/articles/D9j2Nwbp/*/
+		std::string Result;          // string which will contain the result
+
+		std::ostringstream convert;   // stream used for the conversion
+
+		convert << n;      // insert the textual representation of 'Number' in the characters in the stream
+
+		Result = description + convert.str();
+
+		return Result;
+	}
+
+	void loadImage()
+	{
+		if (pixel_honey_comb.loadFromFile("Images/Scenario/background/pixel_comb.png") == 0)
+		{
+			std::cout << "'pixel_comb.png' not found...\n";
+		}
+		background.setTexture(&pixel_honey_comb);
+		background.setSize(sf::Vector2f(WIDTH, HEIGHT));
 	}
 };
 

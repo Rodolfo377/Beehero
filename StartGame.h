@@ -259,9 +259,9 @@ public:
 				drop_strike = 0;
 				invisible_drop = false;
 				steady_rain.reset_timer();
-				for (int i = 1; i < rain.size(); i++)
+				for (int i = 1; i < (int)rain.size(); i++)
 				{
-					rain[i-1].setPosition( i* 75 - 10, 0);
+					rain[i-1].setPosition( (int)i* 75 - 10, 0);
 					/*sets all the sprites to the default image- so in case the player
 					reaches 100 points but loses it, the item wont be there again, but
 					the drops will all be reset to be empty once more*/
@@ -289,7 +289,7 @@ public:
 
 			//Every 2 seconds loads a new rain drop sprite
 
-			if (rain.size() < drops_number)
+			if ((int)rain.size() < drops_number)
 			{
 				create_drop();
 			}
@@ -498,8 +498,8 @@ public:
 
 			if (collecting == true)
 			{
-				tempX = el.flowers[flower_id].getPosition().x;
-				tempY = el.flowers[flower_id].getPosition().y;
+				tempX = (int)el.flowers[flower_id].getPosition().x;
+				tempY = (int)el.flowers[flower_id].getPosition().y;
 
 				//el.player1.move(tempX, tempY);
 
@@ -552,7 +552,7 @@ public:
 			window.draw(el.health);
 			window.draw(el.lives);
 
-			for (int i = 0; i < rain.size(); i++)
+			for (int i = 0; i < (int)rain.size(); i++)
 			{
 				/*If a water drop collided with the bee, it will disappear-wont be drawn anymore*/
 				if (invisible_drop == true)
@@ -616,7 +616,7 @@ public:
 	{
 		times_stop += 1;
 		fly_right = true;
-		el.player1.setPosition(tempX + 20, tempY);
+		el.player1.setPosition((int)tempX + 20, (int)tempY);
 
 
 	}
@@ -625,7 +625,7 @@ public:
 	{
 		if (el.player1.getPosition().y >= tempY - 40)
 		{
-			el.player1.move(0, -speed);
+			el.player1.move(0, (int)-speed);
 			//std::cout << " leaving...\n";
 		}
 		else
@@ -665,7 +665,7 @@ public:
 		}
 		//places the last created drop at a specific place
 
-		rain[rain.size() - 1].setPosition( ((rain.size()) * 75)  - 10, 0);
+		rain[rain.size() - 1].setPosition( (float)((rain.size()) * 75)  - 10, 0);
 
 
 	}
@@ -674,30 +674,30 @@ public:
 	{
 		if (placed == false)
 		{
-			for (int i = 0; i < rain.size(); i++)
+			for (int i = 0; i < (int)rain.size(); i++)
 			{
 				//if it is the last drop, add a 2 second pause
 
-				if (i >= rain.size()-1)
+				if (i >= (int)rain.size()-1)
 				{
 					if (r.timer_check() <= 0)
 					{
-						rain[i].move(0, speed);
+						rain[i].move(0, (int)speed);
 					}//if
 				}//if
 
 				else
 				{
-					rain[i].move(0, speed);
+					rain[i].move(0, (int)speed);
 				}//else
 			}//for
 		}//if(placed == false)
 		if (placed == true && r.timer_check() <= 0)
 		{
 
-			for (int j = 0; j < rain.size(); j++)
+			for (int j = 0; j < (int)rain.size(); j++)
 			{
-				rain[j].move(0, speed);
+				rain[j].move(0, (int)speed);
 			}
 
 
@@ -710,7 +710,7 @@ public:
 	bool detect_collision_water(int &drop_strike)
 	{
 		bool wet = false;
-		for (int i = 0; i < rain.size(); i++)
+		for (int i = 0; i < (int)rain.size(); i++)
 		{
 			if (el.player1.getGlobalBounds().intersects(rain[i].getGlobalBounds()) == true)
 			{
@@ -736,7 +736,7 @@ public:
 
 
 				int p = bumbleBee.getPoints();
-				bumbleBee.setPoints(p*0.6);
+				bumbleBee.setPoints((int)p*0.6);
 
 				int q = bumbleBee.get_hp();
 				bumbleBee.set_hp((int)q*0.5);
@@ -801,7 +801,7 @@ public:
 					{
 						yes_it_hurt = true;
 						int p = bumbleBee.getPoints();
-						bumbleBee.setPoints(p*0.6);
+						bumbleBee.setPoints((int)p*0.6);
 
 						int q = bumbleBee.get_hp();
 						bumbleBee.set_hp((int)q*0.5);

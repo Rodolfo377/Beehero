@@ -25,7 +25,7 @@ public:
 
 	int random_n_generator(const int start, const int total)
 	{
-		srand(time(NULL));
+		srand((int)time(NULL));
 		int result = rand() % total + start;
 		
 		return result;
@@ -44,14 +44,14 @@ public:
 		if (check == 1)
 		{
 
-			start = time(NULL);
+			start = (int)time(NULL);
 
 		}
 
-		end = time(NULL);
+		end = (int)time(NULL);
 
 		//calculates the difference between the instant it started and the most updated time
-		total_seconds = difftime(end, start);
+		total_seconds = (int)difftime(end, start);
 
 		time_left = timeLimit - total_seconds;
 
