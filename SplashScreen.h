@@ -38,7 +38,7 @@ public:
 		loadTitle();
 		blink.timeLimit = 2;
 
-		pressKey = write("PRESS ANY KEY TO START", WIDTH/5, HEIGHT*0.8);
+		pressKey = write("PRESS ANY KEY TO START", WIDTH/8, HEIGHT*0.8);
 		pressKey.setCharacterSize(30);
 
 		while (window.isOpen())

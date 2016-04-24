@@ -21,6 +21,7 @@ of its contents, besides implementing its interactions
 
 Honey comb image downloaded from https://openclipart.org/detail/176455/honeycomb */
 
+
 class Menu
 {
 	//const int SIZE = 4;
@@ -34,16 +35,20 @@ class Menu
 	sf::Sound click;
 	sf::SoundBuffer sel_menu;
 	sf::SoundBuffer cli_menu;
-	int button_id = -1;
+
+	 int button_id = 0;
+	
 
 
 public:
 	Menu()
 	{
-		sf::RenderWindow window(sf::VideoMode(1000, 600), "Menu");
+		
+		sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Menu");
 		window.setFramerateLimit(60);
-
+	
 		sf::Event event;
+		button_id = -1;
 
 		loadImages();
 		loadFont();
@@ -82,7 +87,10 @@ public:
 			while (window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
+				{
+					set_button_clicked(3);
 					window.close();
+				}
 			}
 
 			//Logic
@@ -125,8 +133,7 @@ public:
 					click_counter++;
 					if (click_counter == 1)
 					{
-						click.play();
-						std::cout << "click\n";
+						click.play();				
 
 					}
 					switch (item_id)
@@ -141,7 +148,7 @@ public:
 						window.close();
 						break;
 					case 2://player clicked on the Ranking button
-						set_button_clicked(2);
+						set_button_clicked(2);						
 						window.close();
 						break;
 					case 3://player clicked on the Quit button
@@ -228,7 +235,7 @@ public:
 	//to the specific item so the player can click it and the program will perform the proper response.
 	int check_mouse_position(int a, int b)
 	{
-		std::cout << "\n\n";
+		
 		int chosen = -1;
 		
 		//positions_array[] will hold the x and y coordinates of the 4 menu items in the following fashion:
@@ -270,4 +277,5 @@ public:
 		
 		return button_id;
 	}
+	
 };

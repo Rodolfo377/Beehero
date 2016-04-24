@@ -30,16 +30,12 @@ public:
 		if (polen > 1)
 		{
 			polen--; 
-			ripe = true;
-			
+			ripe = true;			
 		}
 		else
-		{
-			
+		{			
 			ripe = false;
-		}
-		
-		
+		}		
 	}
 
 };

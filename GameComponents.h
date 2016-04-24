@@ -10,6 +10,13 @@
 #include <sstream>
 #include <vector>
 
+#ifndef WIDTH
+#define WIDTH 900
+#endif
+#ifndef HEIGHT
+#define HEIGHT 600
+#endif
+
 class Elements
 {
 	
@@ -21,8 +28,7 @@ private:
 	sf::Texture mission_background;
 	sf::Texture plus_one;
 
-	const int WIDTH = 1000;
-	const int HEIGHT = 600;
+	
 
 	int sprite_index = -1;
 	int tempXflower = 0;
@@ -176,22 +182,22 @@ public:
 	{
 			//0
 			flowers[0].setSize(sf::Vector2f(100, 100));
-			flowers[0].setPosition(400, 150);
+			flowers[0].setPosition(400, 120);
 			flowers[0].setTexture(&flower_tex[0]);
 
 			//1
 			flowers[1].setSize(sf::Vector2f(100, 100));
-			flowers[1].setPosition(550, 300);
+			flowers[1].setPosition(625, 300);
 			flowers[1].setTexture(&flower_tex[1]);
 
 			//2
 			flowers[2].setSize(sf::Vector2f(100, 100));
-			flowers[2].setPosition(400, 450);
+			flowers[2].setPosition(400, 480);
 			flowers[2].setTexture(&flower_tex[2]);
 
 			//3
 			flowers[3].setSize(sf::Vector2f(100, 100));
-			flowers[3].setPosition(250, 300);
+			flowers[3].setPosition(175, 300);
 			flowers[3].setTexture(&flower_tex[3]);
 		
 	}
@@ -237,9 +243,9 @@ public:
 		
 		timer.setFont(font);
 		timer.setCharacterSize(20);
-		timer.setString("Time: "+seconds+"s");
+		timer.setString("Time:"+seconds+"s");
 
-		timer.setPosition(300, 10);
+		timer.setPosition(0, 10);
 	}
 	/*loaadScore() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
 	//To be printed on the screen*/
@@ -256,7 +262,7 @@ public:
 		points.setCharacterSize(20);
 		points.setString(" Score:"+score);
 
-		points.setPosition(500, 10);
+		points.setPosition(WIDTH*0.2, 10);
 	}
 	/*load_hp() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
 	//To be printed on the screen*/
@@ -271,7 +277,7 @@ public:
 		health.setCharacterSize(20);
 		health.setString(" HP:"+life);
 
-		health.setPosition(700, 10);
+		health.setPosition(WIDTH*0.65, 10);
 
 	}
 	/*load_lives() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
@@ -287,7 +293,7 @@ public:
 		lives.setCharacterSize(20);
 		lives.setString(" Lives:" + soul);
 
-		lives.setPosition(820, 10);
+		lives.setPosition(WIDTH*0.8, 10);
 	}
 
 
@@ -314,9 +320,9 @@ public:
 	{
 		//sprite_score.setSize(sf::Vector2f(30, 30));		
 		sprite_score.setTexture(plus_one);
-		tempXflower = (int)flowers[flower_index].getPosition().x + 50;
-		tempYflower = (int)flowers[flower_index].getPosition().y;
-		sprite_score.setPosition((int)tempXflower, (int)tempYflower);
+		tempXflower = (float)flowers[flower_index].getPosition().x + 50;
+		tempYflower = (float)flowers[flower_index].getPosition().y;
+		sprite_score.setPosition((float)tempXflower, (float)tempYflower);
 		//std::cout << "tempXflower: " << tempXflower << " tempYflower: " << tempYflower <<"\n";
 		
 	}

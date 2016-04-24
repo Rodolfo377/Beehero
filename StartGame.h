@@ -15,8 +15,9 @@
 #include <SFML/Graphics/Image.hpp>
 #include "GameComponents.h"
 #include "Classes.h"
+
 #ifndef WIDTH
-#define WIDTH 1000
+#define WIDTH 900
 #endif
 #ifndef HEIGHT
 #define HEIGHT 600
@@ -57,12 +58,16 @@ class StartGame
 	sf::SoundBuffer hpBoostBuffer;
 	sf::SoundBuffer timeBoostBuffer;
 	sf::SoundBuffer LifeUpBuffer;
+	sf::SoundBuffer bonusBuffer;
+	sf::SoundBuffer killBuffer;
 
 	sf::Sound collect;
 	sf::Sound hit;
 	sf::Sound hp_boost;
 	sf::Sound time_boost;
 	sf::Sound lifeUp;
+	sf::Sound bonus;
+	sf::Sound kill;
 
 	Bees bumbleBee;
 	sf::Event event;
@@ -122,12 +127,24 @@ public:
 		{
 			std::cout << "'life_up.wav' not found...\n";
 		}
+		if (bonusBuffer.loadFromFile("Sound/bonus_twenty.wav") == 0)
+		{
+			std::cout << "'bonus_twenty.wav' not found...\n";
+		}
+		if (killBuffer.loadFromFile("Sound/acid_rain.wav") == 0)
+		{
+			std::cout << "'acid_rain.wav' not found...\n";
+		}
+
 
 		collect.setBuffer(collectBuffer);
 		hit.setBuffer(waterBuffer);
 		hp_boost.setBuffer(hpBoostBuffer);
 		time_boost.setBuffer(timeBoostBuffer);
 		lifeUp.setBuffer(LifeUpBuffer);
+		bonus.setBuffer(bonusBuffer);
+		kill.setBuffer(killBuffer);
+
 		//Music
 
 		
@@ -294,7 +311,7 @@ public:
 				create_drop();
 			}
 
-			move_drop(placed, speed);
+			move_drop(placed, speed+2);
 
 
 
@@ -318,11 +335,14 @@ public:
 				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::W){
 					up = true;
 				}
+				
+				
 				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A){
 					left = true;
 					fly_left = true;
 					fly_right = false;
 				}
+	
 				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S){
 					down = true;
 					el.player1.setTexture(&el.bee1_right);
@@ -332,6 +352,30 @@ public:
 					fly_right = true;
 					right = true;
 				}
+
+				//Alternative keys
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up){
+					up = true;
+				}
+
+
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left){
+					left = true;
+					fly_left = true;
+					fly_right = false;
+				}
+
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down){
+					down = true;
+					el.player1.setTexture(&el.bee1_right);
+				}
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right){
+					fly_left = false;
+					fly_right = true;
+					right = true;
+				}
+
+
 
 				//Temporary event that will be equivalent to the time it takes to harvest a flower
 				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z)
@@ -347,7 +391,7 @@ public:
 					if (stop == true)
 					{
 						garden[flower_available].harvest();
-						bumbleBee.add_points(1*stage);
+						bumbleBee.add_points(1);
 						harvesting = true;
 						el.loadScoreSprite(flower_available);
 						collect.play();
@@ -373,6 +417,16 @@ public:
 				{
 					space = false;
 				}
+
+				//Alternative Keys
+				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Up)
+					up = false;
+				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Left)
+					left = false;
+				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down)
+					down = false;
+				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Right)
+					right = false;
 			}
 
 			/****************Logic******************/
@@ -461,7 +515,7 @@ public:
 				/*assesses if the water drop that has collided with the player contains an item in it
 				or not, and decides what is the effect the water dorp has on the player depending on
 				the circumstances*/
-				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item);
+				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item, stage);
 				/*if the collision has only been detected once and the water drop does not contain an item,
 				play a sound effect for being hit*/
 				if (collision_counter == 1 && item_picked == false)
@@ -722,10 +776,10 @@ public:
 		return wet;
 	}
 
-	//If the bee gets hit by a water drop, its polen score gets reduced to 60% 
+	//If the bee gets hit by a water drop, its polen score gets reduced to 50% 
 	//of the previous value, and its health drops by half
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
-	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p)
+	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p,  int stage)
 	{
 		collision_counter++;
 
@@ -736,7 +790,7 @@ public:
 
 
 				int p = bumbleBee.getPoints();
-				bumbleBee.setPoints((int)p*0.6);
+				bumbleBee.setPoints((int)p*0.5);
 
 				int q = bumbleBee.get_hp();
 				bumbleBee.set_hp((int)q*0.5);
@@ -761,6 +815,7 @@ public:
 							bumbleBee.alter_lives(-1);
 							//resets the hp to maximum
 							bumbleBee.set_hp(10);
+							kill.play();
 							//if it was the bee's last life, it perishes
 							if (bumbleBee.getLives() == 0)
 								bumbleBee.set_hp(0);
@@ -773,21 +828,35 @@ public:
 								bumbleBee.add_hp(5);
 								hp_boost.play();
 							}
+
 							/*However, if the bee is left with over 10 hp it will be automatically set to 10 again and the player will
-							//be awarded with an extra life instead*/
+							//be awarded with an extra life instead, until it has 3 lives. If the player already has 3 lives, 20 points 
+							will be added to the score.*/
 							else if (bumbleBee.get_hp()+5 > 10)
 							{
 								bumbleBee.set_hp(10);
-								bumbleBee.alter_lives(1);
+								if (bumbleBee.getLives() < 3)
+								{
+									bumbleBee.alter_lives(1);
+									lifeUp.play();
+								}
+
+								else 
+								{
+									bumbleBee.add_points(20);
+									bonus.play();
+								}
+								
 								//load triumph sound
-								lifeUp.play();
+								
 							}
 							//plays a specific sound effect 
 							
 							break;
 						case 3://time item
 							//gives the player 15 more seconds of play
-							game.timeLimit += 15;
+							game.timeLimit += (15/stage);
+							std::cout << "interval: " << game.timeLimit << "\n";
 							//plays a specific sound effect 
 							time_boost.play();
 							break;

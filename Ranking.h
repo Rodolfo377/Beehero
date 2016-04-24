@@ -113,8 +113,7 @@ private:
 		int i = 0;
 		int index = 0;
 
-		for (int i = 0; i < R_SIZE; i++)
-			std::cout << *(score_array + i) << "\n";
+	
 
 		//Loop looks for the first element of the original array that is lower than the newest score 
 		//and saves that element's position as 'index', then it replaces the original element

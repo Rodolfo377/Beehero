@@ -9,68 +9,76 @@ int main()
 	SplashScreen splash;
 	//Honey points is the total amount of honey that has been collected on all the stages played
 	int honeyPoints = 0;
-	Menu myMenu;
-	int choice = myMenu.get_button_clicked();
+
 	int response = 0;
-
+	bool open = true;
 	
-	while (choice == -1)
+	while (open)
 	{
-		;
-	}
-
-	//Play 
-	if (choice == 0)
-	{
+		Menu myMenu;
+		int choice = myMenu.get_button_clicked();
 		
-		//One object for each stage of the game
-
-		StartGame start[3];
-
-		//Splash screen
-		int i = 0;
-
-
-		while (i <= 2)
+		
+		while (choice == -1)
 		{
-			while (start[i].gameLoop(i + 1) == true)
-			{
-				;
-			}
-			//Open another window
-			//Amount all the polen into honey
-			int hp = start[i].getBeeHP();
-			int lives = start[i].getBeeLives();
-			int polen = start[i].getBeePolen();
-
-			int round_score = hp*lives*polen;
-
-			
-			honeyPoints += round_score;
-			
-
-			HoneyScore hs(hp, lives, polen, honeyPoints);
-
-			i++;
+			;
 		}
-		
-	}
 
-	//Tutorial
-	else if (choice == 1)
-	{
-		std::cout << "player clicked on the Tutorial button\n";
-	}
-	else if (choice == 2)
-	{
-		std::cout << "player clicked on the Ranking button\n";
-		Ranking r(honeyPoints);
-		
-	}
-	else if (choice == 3)
-	{
-		std::cout << "player clicked on the Quit button\n";
-	}
+		//Play 
+		if (choice == 0)
+		{
+			
+			//One object for each stage of the game
+
+			StartGame start[3];
+
+			//Splash screen
+			int i = 0;
+
+
+			while (i <= 2)
+			{
+				while (start[i].gameLoop(i + 1) == true)
+				{
+					;
+				}
+				//Open another window
+				//Amount all the polen into honey
+				int hp = start[i].getBeeHP();
+				int lives = start[i].getBeeLives();
+				int polen = start[i].getBeePolen();
+
+				int round_score = hp*lives*polen;
+
+
+				honeyPoints += round_score;
+
+
+				HoneyScore hs(hp, lives, polen, honeyPoints);
+
+				i++;
+			}
+			Ranking r(honeyPoints);
+
+		}
+
+		//Tutorial
+		else if (choice == 1)
+		{
+			//std::cout << "player clicked on the Tutorial button\n";
+		}
+		else if (choice == 2)
+		{
+			//std::cout << "player clicked on the Ranking button\n";
+			Ranking r(honeyPoints);
+
+		}
+		else if (choice == 3)
+		{
+			//std::cout << "player clicked on the Quit button\n";
+			open = false;
+		}
+}
 	/*
 	
 	//special stage ... Bet yOu wOnt diScover...
