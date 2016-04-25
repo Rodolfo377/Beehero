@@ -3,6 +3,7 @@
 #include "SplashScreen.h"
 #include "HoneyScore.h"
 #include "Ranking.h"
+#include "Tutorial.h"
 
 int main()
 {
@@ -66,6 +67,7 @@ int main()
 		else if (choice == 1)
 		{
 			//std::cout << "player clicked on the Tutorial button\n";
+			Tutorial();
 		}
 		else if (choice == 2)
 		{

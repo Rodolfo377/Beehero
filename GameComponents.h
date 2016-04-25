@@ -10,12 +10,6 @@
 #include <sstream>
 #include <vector>
 
-#ifndef WIDTH
-#define WIDTH 900
-#endif
-#ifndef HEIGHT
-#define HEIGHT 600
-#endif
 
 class Elements
 {
@@ -209,7 +203,7 @@ public:
 
 	void load_background()
 	{
-		background.setSize(sf::Vector2f((float)WIDTH, (float)HEIGHT));
+		background.setSize(sf::Vector2f((float)900, (float)600));
 		background.setPosition(0, 0);
 		background.setTexture(&mission_background);
 	}
@@ -262,7 +256,7 @@ public:
 		points.setCharacterSize(20);
 		points.setString(" Score:"+score);
 
-		points.setPosition(WIDTH*0.2, 10);
+		points.setPosition(900*0.2, 10);
 	}
 	/*load_hp() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
 	//To be printed on the screen*/
@@ -277,7 +271,7 @@ public:
 		health.setCharacterSize(20);
 		health.setString(" HP:"+life);
 
-		health.setPosition(WIDTH*0.65, 10);
+		health.setPosition(900*0.65, 10);
 
 	}
 	/*load_lives() takes an integer as an argument and converts the number to a string, later to be transformed into a Text object
@@ -293,7 +287,7 @@ public:
 		lives.setCharacterSize(20);
 		lives.setString(" Lives:" + soul);
 
-		lives.setPosition(WIDTH*0.8, 10);
+		lives.setPosition(900*0.8, 10);
 	}
 
 

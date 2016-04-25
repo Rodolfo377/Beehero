@@ -16,8 +16,8 @@
 #include "GameComponents.h"
 #include "Classes.h"
 
-#ifndef WIDTH
-#define WIDTH 900
+#ifndef WIDTH2
+#define WIDTH2 900
 #endif
 #ifndef HEIGHT
 #define HEIGHT 600
@@ -206,7 +206,7 @@ public:
 
 
 		//Basic window setup
-		sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "BeeHero");
+		sf::RenderWindow window(sf::VideoMode(WIDTH2, HEIGHT), "BeeHero");
 		window.setFramerateLimit(60);
 		window.setKeyRepeatEnabled(false);
 
@@ -580,7 +580,7 @@ public:
 
 			//Checks if bee is inside the window boundaries
 			//x-axis, invert the current x velocity of the bee
-			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH - 30)
+			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH2 - 30)
 				el.player1.move(-beeXVelocity, 0);
 			//y-axis
 			if (el.player1.getPosition().y < 0 || el.player1.getPosition().y > HEIGHT - 30)
