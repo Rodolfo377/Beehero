@@ -23,6 +23,8 @@
 #define HEIGHT 600
 #endif
 
+#define GAMETIME 100
+
 
 
 /*The source code is adapted from a Udemy Course called 'Learn c++ game development' https://www.udemy.com/learn-c-game-development/
@@ -60,6 +62,7 @@ class StartGame
 	sf::SoundBuffer LifeUpBuffer;
 	sf::SoundBuffer bonusBuffer;
 	sf::SoundBuffer killBuffer;
+	sf::SoundBuffer countdownBuffer;
 
 	sf::Sound collect;
 	sf::Sound hit;
@@ -68,6 +71,7 @@ class StartGame
 	sf::Sound lifeUp;
 	sf::Sound bonus;
 	sf::Sound kill;
+	sf::Sound counting;
 
 	Bees bumbleBee;
 	sf::Event event;
@@ -135,6 +139,10 @@ public:
 		{
 			std::cout << "'acid_rain.wav' not found...\n";
 		}
+		if (countdownBuffer.loadFromFile("Sound/countdown.wav") == 0)
+		{
+			std::cout << "'countdown.wav' not found...\n";
+		}
 
 
 		collect.setBuffer(collectBuffer);
@@ -144,6 +152,7 @@ public:
 		lifeUp.setBuffer(LifeUpBuffer);
 		bonus.setBuffer(bonusBuffer);
 		kill.setBuffer(killBuffer);
+		counting.setBuffer(countdownBuffer);
 
 		//Music
 
@@ -151,7 +160,7 @@ public:
 
 		
 
-		game.timeLimit = 90;
+		game.timeLimit = GAMETIME;
 
 		
 
@@ -249,7 +258,11 @@ public:
 
 		//The more advanced the stage, the more frequently rain is going to fall
 		steady_rain.timeLimit = 20 / stage;
-		
+		//invoking the timer_check() method for the first time makes the timer start
+		steady_rain.timer_check();
+
+		int five_seconds_counter = 0;
+		int five_seconds_loop = 5;
 		while (play == true)
 		{
 
@@ -260,8 +273,7 @@ public:
 			el.loadScore(polen_Score);
 			el.load_hp(health_points);
 			el.load_lives(bumbleBee.getLives());
-			/*polen_Score = bumbleBee.getPoints();
-			el.loadFont(polen_Score, el.points, 600, 10, 30);*/
+			
 
 			//If the game time's up or the bee has taken 10 hp of damage, game is over
 			if (game.timer_check() <= 0 || bumbleBee.get_hp() == 0)
@@ -269,24 +281,39 @@ public:
 				play = false;
 			}
 
-			//makes it rain again every 15, 10 or 5 seconds seconds, after 20 seconds have passed
-			if (game.timer_check() < 65 && steady_rain.timer_check() <= 0)
+			//The following nested if's will serve as a control to play the sound effect of the last 5 seconds only once per second left
+			if (game.timer_check() == five_seconds_loop)
 			{
-				
-				drop_strike = 0;
-				invisible_drop = false;
-				steady_rain.reset_timer();
-				for (int i = 1; i < (int)rain.size(); i++)
+				five_seconds_counter++;
+
+				if (five_seconds_counter == 1)
 				{
-					rain[i-1].setPosition( (int)i* 75 - 10, 0);
-					/*sets all the sprites to the default image- so in case the player
-					reaches 100 points but loses it, the item wont be there again, but
-					the drops will all be reset to be empty once more*/
-					rain[i-1].setTexture(el.water_drop);
+					counting.play();
+					five_seconds_counter = 0;
+					five_seconds_loop -= 1;
 				}
-				//places a special item inside a rain drop
-				if (bumbleBee.getPoints() > 30)
+			}
+
+			//makes it rain again after 25 seconds have passed since the round started
+			if (game.timer_check() < GAMETIME - 25)
+			{
+				//every 20, 10 or 6 seconds, the rain will fall again, steadily and including items
+				if (steady_rain.timer_check() <= 0)
 				{
+					drop_strike = 0;
+					invisible_drop = false;
+					steady_rain.reset_timer();
+
+					for (int i = 0; i < (int)rain.size(); i++)
+					{
+						rain[i].setPosition((int)i * 75 - 10, 0);
+						/*sets all the sprites to the default image- so in case the player
+						reaches 100 points but loses it, the item wont be there again, but
+						the drops will all be reset to be empty once more*/
+						rain[i].setTexture(el.water_drop);
+					}
+					//places a special item inside a rain drop
+
 					int *p;
 					p = place_item();
 
@@ -301,12 +328,13 @@ public:
 					placed = true;
 					//make a small pause before move the rain drops downwards
 					r.reset_timer();
+
 				}
 			}
 
 			//Every 2 seconds loads a new rain drop sprite
 
-			if ((int)rain.size() < drops_number)
+			if (rain.size() < drops_number)
 			{
 				create_drop();
 			}
@@ -728,30 +756,30 @@ public:
 	{
 		if (placed == false)
 		{
-			for (int i = 0; i < (int)rain.size(); i++)
+			for (int i = 0; i < rain.size(); i++)
 			{
 				//if it is the last drop, add a 2 second pause
 
-				if (i >= (int)rain.size()-1)
+				if (i >= rain.size()-1)
 				{
 					if (r.timer_check() <= 0)
 					{
-						rain[i].move(0, (int)speed);
+						rain[i].move(0, speed);
 					}//if
 				}//if
 
 				else
 				{
-					rain[i].move(0, (int)speed);
+					rain[i].move(0, speed);
 				}//else
 			}//for
 		}//if(placed == false)
 		if (placed == true && r.timer_check() <= 0)
 		{
 
-			for (int j = 0; j < (int)rain.size(); j++)
+			for (int j = 0; j < rain.size(); j++)
 			{
-				rain[j].move(0, (int)speed);
+				rain[j].move(0, speed);
 			}
 
 
@@ -764,7 +792,7 @@ public:
 	bool detect_collision_water(int &drop_strike)
 	{
 		bool wet = false;
-		for (int i = 0; i < (int)rain.size(); i++)
+		for (int i = 0; i < rain.size(); i++)
 		{
 			if (el.player1.getGlobalBounds().intersects(rain[i].getGlobalBounds()) == true)
 			{
@@ -790,10 +818,10 @@ public:
 
 
 				int p = bumbleBee.getPoints();
-				bumbleBee.setPoints((int)p*0.5);
+				bumbleBee.setPoints(p*0.5);
 
 				int q = bumbleBee.get_hp();
-				bumbleBee.set_hp((int)q*0.5);
+				bumbleBee.set_hp(q*0.5);
 				hurt = true;
 
 			}
@@ -855,8 +883,8 @@ public:
 							break;
 						case 3://time item
 							//gives the player 15 more seconds of play
-							game.timeLimit += (15/stage);
-							std::cout << "interval: " << game.timeLimit << "\n";
+							game.timeLimit += (10);
+						
 							//plays a specific sound effect 
 							time_boost.play();
 							break;

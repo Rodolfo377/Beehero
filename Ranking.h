@@ -74,26 +74,40 @@ public:Ranking(int newScore)
 
 	//Assigning the updated strings as arguments of a Text object to be displayed on the screen
 	for (int k = 0; k < R_SIZE; k++)
-		bestScores[k] = write(pos[k]+ranking[k], WIDTH / 4, HEIGHT*0.15*(k + 1));
-	
+		bestScores[k] = write(pos[k]+ranking[k], WIDTH / 3, HEIGHT*0.15*(k + 1));
 
+	blink.timeLimit = 2;
+	pressKey = write("PRESS ANY KEY TO LEAVE", WIDTH / 5, HEIGHT*0.85);
+	pressKey.setCharacterSize(25);
+	
+	sf::Event event;
 	while (window.isOpen())
 	{
 		
-		sf::Event event;
+		
 		//Events
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+			if (event.type == sf::Event::KeyPressed)
+			{
+				window.close();
+			}
 		}
 		//Logic
+		blink_item();
 		//Rendering
 		window.clear();
 		window.draw(background);
 		window.draw(title);
 		for (int i = 0; i < R_SIZE; i++)
 			window.draw(bestScores[i]);
+
+		if (visible == true)
+		{
+			window.draw(pressKey);
+		}
 
 		window.display();
 	}

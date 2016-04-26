@@ -45,7 +45,7 @@ public:
 
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 				{
-					std::cout << "Left button\n";
+					
 					if (check_buttons(a, b) == 0)
 						window.close();
 					if (check_buttons(a, b) == 1)
@@ -93,7 +93,7 @@ private:
 			if (y > 485 && y < 546)
 			{
 				choice = 0;
-				std::cout << "Menu!\n";
+				
 			}
 		}
 		if (x > 667 && x < 900)
@@ -101,7 +101,7 @@ private:
 			if (y > 485 && y < 546)
 			{
 				choice = 1;
-				std::cout << "More!\n";
+				
 			}
 		}
 

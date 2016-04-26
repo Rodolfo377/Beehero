@@ -37,7 +37,11 @@ class Menu
 	sf::SoundBuffer cli_menu;
 
 	 int button_id = 0;
-	
+
+	 //Music
+
+
+	 
 
 
 public:
@@ -52,6 +56,8 @@ public:
 
 		loadImages();
 		loadFont();
+
+	
 
 		if (sel_menu.loadFromFile("Sound/menu_select.wav") == 0)
 		{
@@ -78,8 +84,14 @@ public:
 		/*click_counter: will serve as a control variable so that when a menu item
 		is pointed at by the cursor, it plays a sound only once*/
 		int click_counter = 0;
+		bool visible = true;
 
-		while (window.isOpen())
+		for (int k = 0; k < SIZE; k++)
+		{
+			message[k].setColor(sf::Color::Black);
+		}
+
+		while (visible)
 		{
 			
 			//Events
@@ -88,6 +100,7 @@ public:
 			{
 				if (event.type == sf::Event::Closed)
 				{
+					//Closing the Meni window has the same effect of clicking Quit
 					set_button_clicked(3);
 					window.close();
 				}
@@ -141,19 +154,23 @@ public:
 						
 					case 0://player clicked on the Play button
 						set_button_clicked(0);
-						window.close();
+						visible = false;
+						
 						break;
 					case 1://player clicked on the Tutorial button
 						set_button_clicked(1);
-						window.close();
+						//window.close();
+						visible = false;
 						break;
 					case 2://player clicked on the Ranking button
 						set_button_clicked(2);						
-						window.close();
+						//window.close();
+						visible = false;
 						break;
 					case 3://player clicked on the Quit button
 						set_button_clicked(3);
-						window.close();
+						//window.close();
+						visible = false;
 						break;
 					default:
 						break;
@@ -176,6 +193,7 @@ public:
 			}
 			window.display();
 		}
+		//window.setVisible(false);
 	}
 
 	private: 
