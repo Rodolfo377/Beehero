@@ -21,7 +21,9 @@ private:
 	sf::Texture painting;
 	sf::Texture mission_background;
 	sf::Texture plus_one;
-
+	sf::Texture fall;
+	sf::Texture spring;
+	sf::Texture summer;
 	
 
 	int sprite_index = -1;
@@ -169,6 +171,23 @@ public:
 		{
 			std::cout << "Could not find 'water_death.png'...\n";
 		}
+
+		//Background images of each level
+		if (spring.loadFromFile("Images/Scenario/background/spring_background.png") == 0)
+		{
+			std::cout << "Could not find 'spring_background.png'...\n";
+		}
+
+		if (summer.loadFromFile("Images/Scenario/background/summer_background.png") == 0)
+		{
+			std::cout << "Could not find 'summer_background.png'...\n";
+		}
+		if (fall.loadFromFile("Images/Scenario/background/fall_background.png") == 0)
+		{
+			std::cout << "Could not find 'fall_background.png'...\n";
+		}
+
+		
 	}
 
 	//This loads the image on the window, placing each of the RectangleShape objects in a certain place
@@ -201,11 +220,26 @@ public:
 		return flowers[index];
 	}
 
-	void load_background()
+	void load_background(int level)
 	{
-		background.setSize(sf::Vector2f((float)900, (float)600));
+		background.setSize(sf::Vector2f((float)1000, (float)600));
 		background.setPosition(0, 0);
-		background.setTexture(&mission_background);
+		
+
+		if (level == 1)
+		{
+			background.setTexture(&spring);
+		}
+
+		if (level == 2)
+		{
+			background.setTexture(&summer);
+		}
+
+		if (level == 3)
+		{
+			background.setTexture(&fall);
+		}
 	}
 
 	sf::RectangleShape getBackground()

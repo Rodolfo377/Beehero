@@ -16,12 +16,6 @@
 #include "GameComponents.h"
 #include "Classes.h"
 
-#ifndef WIDTH2
-#define WIDTH2 900
-#endif
-#ifndef HEIGHT
-#define HEIGHT 600
-#endif
 
 #define GAMETIME 100
 
@@ -101,7 +95,7 @@ public:
 
 
 		el.load_flowers();
-		el.load_background();
+		
 		el.load_player1();
 		//sets the rain drops to their default image
 		el.loadRain(0);
@@ -182,6 +176,8 @@ public:
 	public: bool gameLoop(int stage)
 	{
 	 
+		el.load_background(stage);
+
 		//States
 	
 		bool play = true;
@@ -215,7 +211,7 @@ public:
 
 
 		//Basic window setup
-		sf::RenderWindow window(sf::VideoMode(WIDTH2, HEIGHT), "BeeHero");
+		sf::RenderWindow window(sf::VideoMode(1000, HEIGHT), "BeeHero");
 		window.setFramerateLimit(60);
 		window.setKeyRepeatEnabled(false);
 
@@ -263,6 +259,8 @@ public:
 
 		int five_seconds_counter = 0;
 		int five_seconds_loop = 5;
+
+
 		while (play == true)
 		{
 
@@ -276,7 +274,7 @@ public:
 			
 
 			//If the game time's up or the bee has taken 10 hp of damage, game is over
-			if (game.timer_check() <= 0 || bumbleBee.get_hp() == 0)
+			if (game.timer_check() <= 0 || (bumbleBee.get_hp() == 0) && (bumbleBee.getLives() == 0))
 			{
 				play = false;
 			}
@@ -608,7 +606,7 @@ public:
 
 			//Checks if bee is inside the window boundaries
 			//x-axis, invert the current x velocity of the bee
-			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH2 - 30)
+			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH - 30)
 				el.player1.move(-beeXVelocity, 0);
 			//y-axis
 			if (el.player1.getPosition().y < 0 || el.player1.getPosition().y > HEIGHT - 30)
@@ -805,7 +803,7 @@ public:
 	}
 
 	//If the bee gets hit by a water drop, its polen score gets reduced to 50% 
-	//of the previous value, and its health drops by half
+	//of the previous value, and its health drops by a quarter
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
 	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p,  int stage)
 	{
@@ -818,7 +816,7 @@ public:
 
 
 				int p = bumbleBee.getPoints();
-				bumbleBee.setPoints(p*0.5);
+				bumbleBee.setPoints(p*0.75);
 
 				int q = bumbleBee.get_hp();
 				bumbleBee.set_hp(q*0.5);
@@ -898,10 +896,18 @@ public:
 					{
 						yes_it_hurt = true;
 						int p = bumbleBee.getPoints();
-						bumbleBee.setPoints((int)p*0.6);
+						bumbleBee.setPoints((int)p*0.75);
 
 						int q = bumbleBee.get_hp();
 						bumbleBee.set_hp((int)q*0.5);
+
+						//if the bee has been so many times as to lose all of its health, and it  has more than one life, it loses
+						//a life and the hp is set to full again.
+						if ((bumbleBee.get_hp() == 0 )&&(bumbleBee.getLives() > 1))
+						{
+							bumbleBee.alter_lives(-1);
+							bumbleBee.set_hp(10);
+						}
 						hurt = true;
 
 					}
