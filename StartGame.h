@@ -83,7 +83,7 @@ class StartGame
 	//constants that will be used through the code
 
 	const int drops_number = 14;
-	
+	bool bonus_available = true;
 
 public:
 	StartGame()
@@ -170,6 +170,7 @@ public:
 
 		char* flower_names[] = { "rose", "violet", "orchid", "sunflower" };
 		
+		
 
 	}
 
@@ -217,7 +218,7 @@ public:
 
 
 		//speed of the bee, in pixels per iteration
-		int speed = 2;
+		int speed = 2*stage;
 
 		/*drop_strike holds the value related to the water drop that hit the player at a cetain moment
 		It is initialized as an invalid index, if compared to the vector of rainSprites that will be created.
@@ -259,6 +260,17 @@ public:
 
 		int five_seconds_counter = 0;
 		int five_seconds_loop = 5;
+		int exact_time = 0;
+
+		//sets the hurt timer, so when the bee is struck by a rain drop it will be stunned for a few seconds 
+		//-It will be treated with more detail in the code
+		h.timeLimit = 5;
+
+		//If we are on stage 2 the popsicle will be available to harvest for a short time, starting at a random moment
+		if (stage == 2)
+		{
+			 exact_time = setRandomTime();
+		}
 
 
 		while (play == true)
@@ -273,8 +285,8 @@ public:
 			el.load_lives(bumbleBee.getLives());
 			
 
-			//If the game time's up or the bee has taken 10 hp of damage, game is over
-			if (game.timer_check() <= 0 || (bumbleBee.get_hp() == 0) && (bumbleBee.getLives() == 0))
+			//If the game time's up or the bee has lost all its hp and lives, the round is over
+			if (game.timer_check() <= 0 || (bumbleBee.get_hp() == 0) || (bumbleBee.getLives() == 0))
 			{
 				play = false;
 			}
@@ -282,22 +294,21 @@ public:
 			//The following nested if's will serve as a control to play the sound effect of the last 5 seconds only once per second left
 			if (game.timer_check() == five_seconds_loop)
 			{
-				five_seconds_counter++;
-
-				if (five_seconds_counter == 1)
-				{
+					
 					counting.play();
-					five_seconds_counter = 0;
+					
 					five_seconds_loop -= 1;
-				}
+				
 			}
 
 			//makes it rain again after 25 seconds have passed since the round started
 			if (game.timer_check() < GAMETIME - 25)
 			{
+				
 				//every 20, 10 or 6 seconds, the rain will fall again, steadily and including items
 				if (steady_rain.timer_check() <= 0)
 				{
+					item_picked = false;
 					drop_strike = 0;
 					invisible_drop = false;
 					steady_rain.reset_timer();
@@ -339,8 +350,41 @@ public:
 
 			move_drop(placed, speed+2);
 
+			
+			if (stage == 2 && bonus_available == true)
+			{
+				//If, during the summer stage, the time remaining is equal to the random time for the popsicle to be shown
+				//Or up to 5 seconds later, the popsicle will  be revealed and the player has a chance of collecting sugar from it
+				if (game.timer_check() <= exact_time && game.timer_check() >= exact_time - 5)
+				{
+					//changes the background image of the stage
+					el.show_popsicle();
 
+					//check bee position
+					if (el.player1.getPosition().x > 50 && el.player1.getPosition().x < 115)
+					{
+						if (el.player1.getPosition().y > 400 && el.player1.getPosition().y < 465)
+						{
+							bonus_available = false;
+							//loads fancy sound
+							collect.play();
+							//add points
+							bumbleBee.add_points(50);
+							//loads fancy sprite
+						}
+					}
 
+				}
+
+				if (game.timer_check() < exact_time - 5)
+				{
+					bonus_available = false;
+				}
+				if (bonus_available == false)
+				{
+					el.cover_popsicle();
+				}
+			}
 
 
 
@@ -465,23 +509,49 @@ public:
 			if (left == false && right == false) { beeXVelocity = 0; }
 
 			//If a water drop struck the bee, it gets hurt and therefore it moves slowly 
-
-			if (hurt == true)
+			//Deals with the case when the rain falls steadly
+			/*
+			if (hurt == true && game.timer_check() < GAMETIME - 25)
 			{
+				/*if the collision has only been detected once and the water drop does not contain an item,
+				play a sound effect for being hit
+				if (collision_counter == 1 && item_picked == false && h.timer_check() > 3)
+				{
+					//plays 'hit' sound effect
+					hit.play();
+				}
 
 				blink_bee(show_bee, blink);
-				//sets the timer to 2 seconds, that is how long the bee will move slower and blink
-				h.timeLimit = 2;
+				
+				
 				//slows the bee and the rain speed, giving a sense of slow-motion
 				speed = 1;
 
-				if (h.timer_check() <= 0){ hurt = false; h.reset_timer(); show_bee = true; }
+				if (h.timer_check() <= 3){ show_bee = true; speed = 2 * stage; }
+				if (h.timer_check() <= 0) { hurt = false;  h.reset_timer(); }
+			}*/
+			//Deals with the case when the each rain drop falls at a time
+			if (hurt == true)
+			{
+				/*if the collision has only been detected once and the water drop does not contain an item,
+				play a sound effect for being hit*/
+				if (collision_counter == 1 && item_picked == false)
+				{
+					//plays 'hit' sound effect
+					hit.play();
+				}
+
+				blink_bee(show_bee, blink);
+
+
+				//slows the bee and the rain speed, giving a sense of slow-motion
+				speed = 1;
+
+				if (h.timer_check() <= 3){ show_bee = true; speed = 2 * stage; hurt = false;  h.reset_timer(); }
+				
 			}
 
-			if (hurt == false)
-			{
-				speed = 2*stage;
-			}
+			
 			el.player1.move(beeXVelocity, beeYVelocity);
 
 			if (harvesting == true)
@@ -539,16 +609,12 @@ public:
 			{
 				invisible_drop = true;
 				/*assesses if the water drop that has collided with the player contains an item in it
-				or not, and decides what is the effect the water dorp has on the player depending on
+				or not, and decides what is the effect the water drop has on the player depending on
 				the circumstances*/
-				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item, stage);
-				/*if the collision has only been detected once and the water drop does not contain an item,
-				play a sound effect for being hit*/
-				if (collision_counter == 1 && item_picked == false)
-					hit.play();
+				
+				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item, stage, five_seconds_loop);
 
-				//resets the variable so the hit sound can be played again
-				item_picked = false;
+				
 			}
 			if (detect_collision_water(drop_strike) == false)
 			{
@@ -559,11 +625,14 @@ public:
 
 			//Scanning
 			for (int i = 0; i < 4; i++)
-			{	//if the bee is inside the flower space, the index of the flower 
-				//is saved and the boolean variable collecting is set to true, which triggers the methods that will:
+			{	
+				//if the bee is inside the flower space, the index of the flower 
+				//is saved and the boolean variable 'collecting' is set to true, which triggers the methods that will:
 				//1) guide the bee towards the center of the flower 
-				//2)  hold it there so the player can start harvesting the flower
-				//3) once the player is done harvesting - polen runs out- the bee will be lifted just above the flower and set free
+				//2) hold it there so the player can start harvesting the flower
+				//3) once the player is done harvesting - polen runs out or player leaves manually by pressing the Z key- 
+				//the bee will be lifted just above the flower and set free
+
 				if (el.player1.getGlobalBounds().intersects(el.flowers[i].getGlobalBounds()) == true && leave == false)
 				{
 					if (i == flower_available)
@@ -609,7 +678,7 @@ public:
 			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH - 30)
 				el.player1.move(-beeXVelocity, 0);
 			//y-axis
-			if (el.player1.getPosition().y < 0 || el.player1.getPosition().y > HEIGHT - 30)
+			if (el.player1.getPosition().y < 35 || el.player1.getPosition().y > HEIGHT - 30)
 				el.player1.move(0, -beeYVelocity);
 
 			/****************Rendering******************/
@@ -803,9 +872,9 @@ public:
 	}
 
 	//If the bee gets hit by a water drop, its polen score gets reduced to 50% 
-	//of the previous value, and its health drops by a quarter
+	//of the previous value, and its health drops by a quarter.
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
-	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p,  int stage)
+	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p,  int stage, int &countdown)
 	{
 		collision_counter++;
 
@@ -823,96 +892,106 @@ public:
 				hurt = true;
 
 			}
+
 			else//placed == true
 			{
-
-				bool yes_it_hurt = false;
-				//tests if the bee was struck by a drop containing an item
-				for (int i = 0; i < 6; i += 2)
+				if (item_picked == false)
 				{
-					if (drop_strike == p[i])
-					{
-						item_picked = true;
-						//if so, checks what item is it and then decides what the response is going to be
-						switch (p[i + 1])
-						{
-						case 1://death item
-							//wipes out the bumblebee's life
-							bumbleBee.alter_lives(-1);
-							//resets the hp to maximum
-							bumbleBee.set_hp(10);
-							kill.play();
-							//if it was the bee's last life, it perishes
-							if (bumbleBee.getLives() == 0)
-								bumbleBee.set_hp(0);
-							//std::cout << "Died! \n";
-							break;
-						case 2://heart item
-							//Adds 5 to the bumblebee's hp
-							if (bumbleBee.get_hp() + 5 <= 10)
-							{
-								bumbleBee.add_hp(5);
-								hp_boost.play();
-							}
+					//bool yes_it_hurt = false;
+					//tests if the bee was struck by a drop containing an item
 
-							/*However, if the bee is left with over 10 hp it will be automatically set to 10 again and the player will
-							//be awarded with an extra life instead, until it has 3 lives. If the player already has 3 lives, 20 points 
-							will be added to the score.*/
-							else if (bumbleBee.get_hp()+5 > 10)
+					for (int i = 0; i < 6; i += 2)
+					{
+						if (drop_strike == p[i])
+						{
+							item_picked = true;
+							//if so, checks what item is it and then decides what the response is going to be
+							switch (p[i + 1])
 							{
+							case 1://death item
+								//wipes out the bumblebee's life
+								bumbleBee.alter_lives(-1);
+								//resets the hp to maximum
 								bumbleBee.set_hp(10);
-								if (bumbleBee.getLives() < 3)
+								kill.play();
+								//if it was the bee's last life, it perishes
+								if (bumbleBee.getLives() == 0)
+									bumbleBee.set_hp(0);
+								//std::cout << "Died! \n";
+								break;
+
+							case 2://heart item
+								//Adds 5 to the bumblebee's hp
+								if (bumbleBee.get_hp() + 5 <= 10)
 								{
-									bumbleBee.alter_lives(1);
-									lifeUp.play();
+									bumbleBee.add_hp(5);
+									hp_boost.play();
 								}
 
-								else 
+								/*However, if the bee is left with over 10 hp it will be automatically set to 10 again and the player will
+								//be awarded with an extra life instead, until it has 3 lives. If the player already has 3 lives, 20 points
+								will be added to the score.*/
+								else if (bumbleBee.get_hp() + 5 > 10)
 								{
-									bumbleBee.add_points(20);
-									bonus.play();
+									bumbleBee.set_hp(10);
+									if (bumbleBee.getLives() < 3)
+									{
+										bumbleBee.alter_lives(1);
+										lifeUp.play();
+									}
+
+									else
+									{
+										bumbleBee.add_points(20);
+										bonus.play();
+									}
+
+
+
 								}
-								
-								//load triumph sound
-								
-							}
-							//plays a specific sound effect 
-							
-							break;
-						case 3://time item
-							//gives the player 15 more seconds of play
-							game.timeLimit += (10);
-						
-							//plays a specific sound effect 
-							time_boost.play();
-							break;
-						default:
-							break;
-						}//closes switch
-					}//closes drop_strike if
 
-					//if there was a collision, and no item has already been taken, it must be an empty drop, so it will hurt the bee 
-					if (drop_strike != p[i] && item_picked == false && yes_it_hurt == false)
-					{
-						yes_it_hurt = true;
-						int p = bumbleBee.getPoints();
-						bumbleBee.setPoints((int)p*0.75);
 
-						int q = bumbleBee.get_hp();
-						bumbleBee.set_hp((int)q*0.5);
+								break;
 
-						//if the bee has been so many times as to lose all of its health, and it  has more than one life, it loses
-						//a life and the hp is set to full again.
-						if ((bumbleBee.get_hp() == 0 )&&(bumbleBee.getLives() > 1))
+							case 3://time item
+								//gives the player 15 more seconds of play
+								game.timeLimit += (10);
+
+								//resets the countdown sound effect counter to 5, so if the player gets the time item in the final 5 seconds
+								//the sound effect will be played  the next time the round is about to end. 
+								countdown = 5;
+								//plays a specific sound effect 
+								time_boost.play();
+								break;
+							default:
+								break;
+							}//closes switch
+						}//closes drop_strike if
+
+						//if there was a collision, and no item has already been taken, it must be an empty drop, so it will hurt the bee 
+						if (drop_strike != p[i] && item_picked == false && hurt == false)
 						{
-							bumbleBee.alter_lives(-1);
-							bumbleBee.set_hp(10);
-						}
-						hurt = true;
+							hurt = true;
+							int p = bumbleBee.getPoints();
+							bumbleBee.setPoints((int)p*0.75);
 
+							int q = bumbleBee.get_hp();
+							bumbleBee.set_hp((int)q*0.5);
+
+							//if the bee has been so many times as to lose all of its health, and it  has more than one life, it loses
+							//a life and the hp is set to full again.
+							if ((bumbleBee.get_hp() == 0) && (bumbleBee.getLives() > 1))
+							{
+								bumbleBee.alter_lives(-1);
+								bumbleBee.set_hp(10);
+							}
+							
+
+						}
 					}
-				}
+				}//if item_picked == true
 			}//closes else (placed == true)
+			
 		}
 	}
 
@@ -1012,4 +1091,21 @@ public:
 	{
 		return bumbleBee.get_hp();
 	}
+
+	//This function sets a random time for the plastic cover to be removed from the pospsicle during summer (stage 2)
+	int setRandomTime()
+	{
+		Methods specialItem;
+		int t = specialItem.random_n_generator(10, 80);
+		setSpecialItem(t);
+
+		return t;
+	}
+
+	void setSpecialItem(int instant)
+	{
+
+	}
+	
+
 };

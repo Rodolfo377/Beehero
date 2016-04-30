@@ -24,6 +24,7 @@ private:
 	sf::Texture fall;
 	sf::Texture spring;
 	sf::Texture summer;
+	sf::Texture summer_special;
 	
 
 	int sprite_index = -1;
@@ -182,6 +183,12 @@ public:
 		{
 			std::cout << "Could not find 'summer_background.png'...\n";
 		}
+
+		if (summer_special.loadFromFile("Images/Scenario/background/summer_background_2.png") == 0)
+		{
+			std::cout << "Could not find 'summer_background_2.png'...\n";
+		}
+
 		if (fall.loadFromFile("Images/Scenario/background/fall_background.png") == 0)
 		{
 			std::cout << "Could not find 'fall_background.png'...\n";
@@ -388,5 +395,14 @@ public:
 	}
 	//make the rectangle container move downwards by 1 pixel everytime it is called , simulating rain
 	
+	void show_popsicle()
+	{
+		background.setTexture(&summer_special);
+	}
+
+	void cover_popsicle()
+	{
+		background.setTexture(&summer);
+	}
 	
 };

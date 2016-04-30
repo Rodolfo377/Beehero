@@ -83,18 +83,21 @@ int main()
 				if (i == 0)
 				{					
 					stage1.play();
+					stage1.setVolume(30);
 					stage1.setLoop(true);
 				}
 				if (i == 1)
 				{
 					stage1.stop();
 					stage2.play();
+					stage2.setVolume(30);
 					stage2.setLoop(true);
 				}
 				if (i == 2)
 				{
 					stage2.stop();
 					stage3.play();
+					stage3.setVolume(30);
 					stage3.setLoop(true);
 				}
 
