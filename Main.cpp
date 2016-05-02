@@ -13,7 +13,7 @@ int main()
 	SplashScreen splash;
 	//Honey points is the total amount of honey that has been collected on all the stages played
 	int honeyPoints = 0;
-
+	int round_score[3];
 	int response = 0;
 	bool open = true;
 	
@@ -112,19 +112,19 @@ int main()
 				int lives = start[i].getBeeLives();
 				int polen = start[i].getBeePolen();
 
-				int round_score = hp*lives*polen;
+				 round_score[i] = hp*lives*polen;
+				
+
+				honeyPoints += round_score[i];
 
 
-				honeyPoints += round_score;
-
-
-				HoneyScore hs(hp, lives, polen, honeyPoints);
+				HoneyScore hs(hp, lives, polen, round_score[i]);
 
 				i++;
 			}
 			stage3.stop();
 			intro.play();
-			Winter w(honeyPoints);
+			Winter w(round_score);
 
 			Ranking r(honeyPoints);
 

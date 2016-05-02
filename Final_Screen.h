@@ -28,13 +28,18 @@ Score Band ---- Bee Hives
 So, the number of bee hives work as a manner of grading of the player's game result, from 1 to 6
 (and zero only if the player was not able to survive at least one round and harvest at least one flower).
 */
-class Winter
+class Winter : public StandartWindow
 {
 	sf::Texture hive[7];
 	sf::RectangleShape canvas;
+	sf::SoundBuffer collectBuffer;
+	sf::Sound collect;
+	sf::Text roundText[3];
+	sf::Text totalHoney;
+	sf::Text thanks;
 
 public:
-	Winter(const int final_score)
+	Winter(const int *scores)
 	{
 		
 			sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Results");
@@ -45,10 +50,30 @@ public:
 			canvas.setSize(sf::Vector2f(WIDTH, HEIGHT));
 			canvas.setPosition(0, 0);
 
+			if (collectBuffer.loadFromFile("Sound/polen_pickup.wav") == 0)
+			{
+				std::cout << "'polen_pickup.wav' not found...\n";
+			}
+
+			int final_score = 0;
+			int round_score = 0;
+			int round_counter = 0;
+			
+			collect.setBuffer(collectBuffer);
+			collect.setVolume(40);
+
 			loadImages();
+			
+			//the variable 'counting' will help the code skip the statements that deal with drawing the proper number of hives on
+			//the screen after it has been done. 
+			bool counting = true;
+			std::cout << "final score: "<<final_score << "\n";
 			chooseImage(final_score);
 
-			std::cout << "final score: "<<final_score << "\n";
+			//round_counter is a variable that will help making the final sum of the scores (the one visually displayed) 
+			//quicker to the user.
+			
+			thanks = write("Thanks for playing!", 570, 500);
 
 			while (window.isOpen())
 			{
@@ -59,9 +84,107 @@ public:
 						window.close();
 				}
 
+				if (counting)
+				{
+
 				window.clear();
 				window.draw(canvas);
 				window.display();
+
+				
+					for (int i = 0; i < 3; i++)
+					{
+						std::cout << "loop number " << i << "\n";
+
+						
+
+						while (round_counter < *(scores + i))
+						{
+
+							if (round_counter + 100 > *(scores + i))
+							{
+								round_counter += 1;
+								collect.play();
+							}
+
+							else
+							{
+								round_counter += 50;
+								collect.play();
+							}
+
+							//If the code is now counting the second or the third rounds, the total score now considers the previous
+							//results as well as the new one.
+							if (i > 0)
+							{
+								for (int j = 1; j <= i; j++)
+								{
+									round_score += *(scores + (i - j));
+									std::cout << "round " << i -j << " score : "<<*(scores + (i - j)) << "\n";
+								}
+								std::cout << round_score << "\n";
+								round_score += round_counter;
+							}
+
+							else
+							{
+								round_score = round_counter;
+							}
+
+							//std::cout << round_score << " is the round score \n";
+
+							chooseImage(round_score);							
+
+							
+							roundText[i] = write(convert("Round ", i + 1) + convert(" : ",round_counter), 700, 70 + 70*i);
+
+
+							window.clear();
+							window.draw(canvas);
+
+							for (int k = 0; k <= i; k++)
+							{
+								if (k != i)
+								{
+									roundText[k] = write(convert("Round ", k + 1) + convert(" : ", *(scores + k)), 700, 70 + 70 * k);
+								}
+
+								window.draw(roundText[k]);
+								
+							}//closes for k								
+							
+							window.display();
+							round_score = 0;
+						}//closes while
+
+						round_counter = 0;
+
+						final_score += *(scores + i);
+						std::cout << final_score << " is the final score \n";
+						//std::cout << *(scores + i) << "\n";
+					}//closes for i
+					counting = false;
+				}//closes if counting
+				
+				if (!counting)
+				{
+					window.clear();
+					window.draw(canvas);
+
+					for (int k = 0; k <= 2; k++)
+					{
+						roundText[k] = write(convert("Round ", k + 1) + convert(" : ", *(scores + k)), 700, 70 + 70 * k);
+
+						window.draw(roundText[k]);
+					}//closes for k	
+
+					totalHoney = write(convert("Total Honey: ", final_score), 580, 300);
+					totalHoney.setCharacterSize(22);
+					window.draw(totalHoney);
+					window.draw(thanks);
+					window.display();
+				}
+				
 			}//while window is open		
 	}//class constructor
 
@@ -102,25 +225,16 @@ private:
 	//chooses proper background image based on the final score 
 	void chooseImage(const int final_score)
 	{
-		
+		std::cout << final_score << "\n";
 
-		if (final_score == 0)
-		{
-			std::cout << " 0\n";
+		if (final_score == 0)	
 			canvas.setTexture(&hive[0]);
-		}
 		else if (final_score > 0 && final_score < 5000)
 			canvas.setTexture(&hive[1]);
 		else if (final_score >= 5000 && final_score < 10000)
-		{
-			std::cout << "Entre 5k e 10k\n";
 			canvas.setTexture(&hive[2]);
-		}
 		else if (final_score >= 10000 && final_score < 15000)
-		{
-			std::cout << "Entre 10k e 15k\n";
 			canvas.setTexture(&hive[3]);
-		}
 		else if (final_score >= 15000 && final_score < 20000)
 			canvas.setTexture(&hive[4]);
 		else if (final_score >= 20000 && final_score < 25000)

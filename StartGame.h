@@ -148,6 +148,7 @@ public:
 		kill.setBuffer(killBuffer);
 		counting.setBuffer(countdownBuffer);
 
+		collect.setVolume(40);
 		//Music
 
 		
@@ -302,7 +303,7 @@ public:
 			}
 
 			//makes it rain again after 25 seconds have passed since the round started
-			if (game.timer_check() < GAMETIME - 25)
+			if (game.timer_check() < GAMETIME - 30)
 			{
 				
 				//every 20, 10 or 6 seconds, the rain will fall again, steadily and including items

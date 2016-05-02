@@ -29,18 +29,18 @@ class HoneyScore:public StandartWindow
 	
 
 public:
-	HoneyScore(int hp, int lives, int polen, int globalHoney)
+	HoneyScore(int hp, int lives, int polen, int total_honey)
 	{
 		int health = 0;
 		int lives_n = 0;
 		int collected = 0;
-		int total_honey = 0;
+		
 
 		health = hp;
 		lives_n = lives;
 		collected = polen;
 
-		total_honey = hp*lives*polen;
+		
 
 		blink.timeLimit = 2;
 
@@ -59,7 +59,7 @@ public:
 		//The amount of honey is calculated*/
 		sf::Text multiply = write("X_____________", WIDTH/4, HEIGHT*0.5);
 		honey_points = write(convert("   Honey: ",total_honey), WIDTH / 4, HEIGHT *0.7);	
-		totalPoints = write(convert("   Total Honey: ", globalHoney), WIDTH/4, HEIGHT*0.8);
+		
 		pressKey = write("Press Enter to continue...\n", WIDTH/4, HEIGHT*0.95);
 
 		
