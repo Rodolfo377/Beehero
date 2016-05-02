@@ -4,6 +4,7 @@
 #include "HoneyScore.h"
 #include "Ranking.h"
 #include "Tutorial.h"
+#include "Final_Screen.h"
 
 #include <SFML/Audio.hpp>
 
@@ -123,9 +124,11 @@ int main()
 			}
 			stage3.stop();
 			intro.play();
+			Winter w(honeyPoints);
+
 			Ranking r(honeyPoints);
 
-		}
+		}//choice == 0 (Play)
 
 		//Tutorial
 		else if (choice == 1)

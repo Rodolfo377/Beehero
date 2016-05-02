@@ -59,6 +59,7 @@ public:
 	sf::Text lives;
 
 	sf::Sprite sprite_score;
+	sf::Sprite special;
 
 	//Sound
 	
@@ -362,21 +363,18 @@ public:
 		
 	}
 
-	//gives the fading out effect to the plus one image
-	//this function code was adapted from http://en.sfml-dev.org/forums/index.php?topic=2693.0
-	void fade_out(int index)
+	void loadSpecialSprite(int x, int y, int sprite_id)
 	{
-		/*
-		sprite_score.setColor(sf::Color(255, 255, 255, a));
-		a=-10;*/
-
-		std::cout << "fading\n";
-		sprite_score.move(0, -1);
-
-		if (sprite_score.getPosition().y > tempYflower - 10)
+		switch (sprite_id)
 		{
-			//kill sprite
-			sprite_score.setColor(sf::Color(255, 255, 255, 0));
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		default:
+			break;
 		}
 	}
 	/*loads the water drop image to a sprite that can be moved.

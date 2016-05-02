@@ -264,7 +264,7 @@ public:
 
 		//sets the hurt timer, so when the bee is struck by a rain drop it will be stunned for a few seconds 
 		//-It will be treated with more detail in the code
-		h.timeLimit = 5;
+		h.timeLimit = 2;
 
 		//If we are on stage 2 the popsicle will be available to harvest for a short time, starting at a random moment
 		if (stage == 2)
@@ -509,28 +509,6 @@ public:
 			if (left == false && right == false) { beeXVelocity = 0; }
 
 			//If a water drop struck the bee, it gets hurt and therefore it moves slowly 
-			//Deals with the case when the rain falls steadly
-			/*
-			if (hurt == true && game.timer_check() < GAMETIME - 25)
-			{
-				/*if the collision has only been detected once and the water drop does not contain an item,
-				play a sound effect for being hit
-				if (collision_counter == 1 && item_picked == false && h.timer_check() > 3)
-				{
-					//plays 'hit' sound effect
-					hit.play();
-				}
-
-				blink_bee(show_bee, blink);
-				
-				
-				//slows the bee and the rain speed, giving a sense of slow-motion
-				speed = 1;
-
-				if (h.timer_check() <= 3){ show_bee = true; speed = 2 * stage; }
-				if (h.timer_check() <= 0) { hurt = false;  h.reset_timer(); }
-			}*/
-			//Deals with the case when the each rain drop falls at a time
 			if (hurt == true)
 			{
 				/*if the collision has only been detected once and the water drop does not contain an item,
@@ -547,7 +525,7 @@ public:
 				//slows the bee and the rain speed, giving a sense of slow-motion
 				speed = 1;
 
-				if (h.timer_check() <= 3){ show_bee = true; speed = 2 * stage; hurt = false;  h.reset_timer(); }
+				if (h.timer_check() <= 0){ show_bee = true; speed = 2 * stage; hurt = false;  h.reset_timer(); }
 				
 			}
 
@@ -678,6 +656,7 @@ public:
 			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH - 30)
 				el.player1.move(-beeXVelocity, 0);
 			//y-axis
+			//prevents bee from reaching a drop that is hanging on the top of the window
 			if (el.player1.getPosition().y < 35 || el.player1.getPosition().y > HEIGHT - 30)
 				el.player1.move(0, -beeYVelocity);
 
