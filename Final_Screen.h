@@ -37,9 +37,10 @@ class Winter : public StandartWindow
 	sf::Text roundText[3];
 	sf::Text totalHoney;
 	sf::Text thanks;
+	sf::Text presskey;
 
 public:
-	Winter(const int *scores)
+	Winter(const int * const scores)
 	{
 		
 			sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Results");
@@ -67,13 +68,17 @@ public:
 			//the variable 'counting' will help the code skip the statements that deal with drawing the proper number of hives on
 			//the screen after it has been done. 
 			bool counting = true;
-			std::cout << "final score: "<<final_score << "\n";
+			
 			chooseImage(final_score);
 
 			//round_counter is a variable that will help making the final sum of the scores (the one visually displayed) 
 			//quicker to the user.
 			
-			thanks = write("Thanks for playing!", 570, 500);
+			thanks = write("'Thanks for playing!' - Rodolfo", 350, 500);
+
+			pressKey = write("PRESS ANY KEY TO LEAVE", WIDTH / 5, HEIGHT - 50);
+			pressKey.setCharacterSize(25);
+			blink.timeLimit = 2;
 
 			while (window.isOpen())
 			{
@@ -82,6 +87,11 @@ public:
 				{
 					if (event.type == sf::Event::Closed)
 						window.close();
+
+					if (event.type == sf::Event::KeyPressed)
+					{
+						window.close();
+					}
 				}
 
 				if (counting)
@@ -94,7 +104,7 @@ public:
 				
 					for (int i = 0; i < 3; i++)
 					{
-						std::cout << "loop number " << i << "\n";
+						
 
 						
 
@@ -120,9 +130,9 @@ public:
 								for (int j = 1; j <= i; j++)
 								{
 									round_score += *(scores + (i - j));
-									std::cout << "round " << i -j << " score : "<<*(scores + (i - j)) << "\n";
+								
 								}
-								std::cout << round_score << "\n";
+								
 								round_score += round_counter;
 							}
 
@@ -131,7 +141,7 @@ public:
 								round_score = round_counter;
 							}
 
-							//std::cout << round_score << " is the round score \n";
+							
 
 							chooseImage(round_score);							
 
@@ -160,8 +170,8 @@ public:
 						round_counter = 0;
 
 						final_score += *(scores + i);
-						std::cout << final_score << " is the final score \n";
-						//std::cout << *(scores + i) << "\n";
+					
+					
 					}//closes for i
 					counting = false;
 				}//closes if counting
@@ -181,7 +191,14 @@ public:
 					totalHoney = write(convert("Total Honey: ", final_score), 580, 300);
 					totalHoney.setCharacterSize(22);
 					window.draw(totalHoney);
+
+
 					window.draw(thanks);
+					blink_item();
+
+					if (visible)
+					window.draw(pressKey);
+
 					window.display();
 				}
 				
@@ -225,7 +242,7 @@ private:
 	//chooses proper background image based on the final score 
 	void chooseImage(const int final_score)
 	{
-		std::cout << final_score << "\n";
+	
 
 		if (final_score == 0)	
 			canvas.setTexture(&hive[0]);

@@ -54,9 +54,10 @@ class StartGame
 	sf::SoundBuffer hpBoostBuffer;
 	sf::SoundBuffer timeBoostBuffer;
 	sf::SoundBuffer LifeUpBuffer;
-	sf::SoundBuffer bonusBuffer;
+	sf::SoundBuffer plus_twenty_Buffer;
 	sf::SoundBuffer killBuffer;
 	sf::SoundBuffer countdownBuffer;
+	sf::SoundBuffer popsicle;
 
 	sf::Sound collect;
 	sf::Sound hit;
@@ -66,6 +67,7 @@ class StartGame
 	sf::Sound bonus;
 	sf::Sound kill;
 	sf::Sound counting;
+	sf::Sound blessed_50;
 
 	Bees bumbleBee;
 	sf::Event event;
@@ -125,7 +127,7 @@ public:
 		{
 			std::cout << "'life_up.wav' not found...\n";
 		}
-		if (bonusBuffer.loadFromFile("Sound/bonus_twenty.wav") == 0)
+		if (plus_twenty_Buffer.loadFromFile("Sound/bonus_twenty.wav") == 0)
 		{
 			std::cout << "'bonus_twenty.wav' not found...\n";
 		}
@@ -137,6 +139,10 @@ public:
 		{
 			std::cout << "'countdown.wav' not found...\n";
 		}
+		if (popsicle.loadFromFile("Sound/popsicle.wav") == 0)
+		{
+			std::cout << "'pospcile.wav' not found...\n";
+		}
 
 
 		collect.setBuffer(collectBuffer);
@@ -144,9 +150,10 @@ public:
 		hp_boost.setBuffer(hpBoostBuffer);
 		time_boost.setBuffer(timeBoostBuffer);
 		lifeUp.setBuffer(LifeUpBuffer);
-		bonus.setBuffer(bonusBuffer);
+		bonus.setBuffer(plus_twenty_Buffer);
 		kill.setBuffer(killBuffer);
 		counting.setBuffer(countdownBuffer);
+		blessed_50.setBuffer(popsicle);
 
 		collect.setVolume(40);
 		//Music
@@ -210,7 +217,7 @@ public:
 		bool collecting = false;
 		bool stop = false;
 		bool leave = false;
-
+		bool bonus_item = false;
 
 		//Basic window setup
 		sf::RenderWindow window(sf::VideoMode(1000, HEIGHT), "BeeHero");
@@ -262,6 +269,9 @@ public:
 		int five_seconds_counter = 0;
 		int five_seconds_loop = 5;
 		int exact_time = 0;
+
+		int bonus_id = -1;
+		int bonus_fly_counter = 0;
 
 		//sets the hurt timer, so when the bee is struck by a rain drop it will be stunned for a few seconds 
 		//-It will be treated with more detail in the code
@@ -356,28 +366,32 @@ public:
 			{
 				//If, during the summer stage, the time remaining is equal to the random time for the popsicle to be shown
 				//Or up to 5 seconds later, the popsicle will  be revealed and the player has a chance of collecting sugar from it
-				if (game.timer_check() <= exact_time && game.timer_check() >= exact_time - 5)
+				if (game.timer_check() <= exact_time && game.timer_check() >= exact_time - 3)
 				{
 					//changes the background image of the stage
 					el.show_popsicle();
 
-					//check bee position
-					if (el.player1.getPosition().x > 50 && el.player1.getPosition().x < 115)
+					//check if bee position is the same of the pospicle
+					if ((el.player1.getPosition().x > 50 && el.player1.getPosition().x < 115) 
+						|| (el.player1.getPosition().x + 15 > 50 && el.player1.getPosition().x + 15 < 115))
 					{
-						if (el.player1.getPosition().y > 400 && el.player1.getPosition().y < 465)
+						if ((el.player1.getPosition().y > 400 && el.player1.getPosition().y < 465) 
+							|| (el.player1.getPosition().y + 15 > 400 && el.player1.getPosition().y + 15 < 465))
 						{
 							bonus_available = false;
 							//loads fancy sound
-							collect.play();
+							blessed_50.play();
 							//add points
 							bumbleBee.add_points(50);
 							//loads fancy sprite
+							bonus_item = true;
+							bonus_id = 6;
 						}
 					}
 
 				}
 
-				if (game.timer_check() < exact_time - 5)
+				if (game.timer_check() < exact_time - 3)
 				{
 					bonus_available = false;
 				}
@@ -393,54 +407,51 @@ public:
 			while (window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
-					play = false;
-
-				/*ke.getEvents(event, el);
-				ke.runLogic();
-				ke.flapWings();*/
-				/*KeyBoardEvents*/
+					play = false;		
 
 				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 					play = false;
 
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::W){
-					up = true;
-				}
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::W)
+					up = true;			
 				
-				
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A){
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
+				{
 					left = true;
 					fly_left = true;
 					fly_right = false;
 				}
 	
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S){
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S)
 					down = true;
-					el.player1.setTexture(&el.bee1_right);
-				}
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D){
+
+				
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D)
+				{
 					fly_left = false;
 					fly_right = true;
 					right = true;
 				}
 
 				//Alternative keys
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up){
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
 					up = true;
-				}
+				
 
 
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left){
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
+				{
 					left = true;
 					fly_left = true;
 					fly_right = false;
 				}
 
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down){
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down)
+				{
 					down = true;
-					el.player1.setTexture(&el.bee1_right);
 				}
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right){
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right)
+				{
 					fly_left = false;
 					fly_right = true;
 					right = true;
@@ -485,9 +496,8 @@ public:
 				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::D)
 					right = false;
 				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Space)
-				{
 					space = false;
-				}
+				
 
 				//Alternative Keys
 				if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Up)
@@ -591,7 +601,7 @@ public:
 				or not, and decides what is the effect the water drop has on the player depending on
 				the circumstances*/
 				
-				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item, stage, five_seconds_loop);
+				take_damage(placed, hurt, item_picked, collision_counter, drop_strike, water_item, stage, five_seconds_loop, bonus_item, bonus_id, fly_left, fly_right);
 
 				
 			}
@@ -696,10 +706,77 @@ public:
 
 			}
 
+			//Draws the +1 sprite each time  the player harvests a flower
 			if (harvesting == true)
 			{
 				window.draw(el.sprite_score);
 			}
+
+
+			/*If the player catches any item from the rain (heart, time or death) or is lucky to get the pospcile, a special
+			sprite will be drawn on the screen*/
+			if (bonus_item == true)
+			{
+				switch(bonus_id)
+				{
+				//////////Heart
+				//+5 HP
+				case 0:
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 0);
+					break;
+
+				//+1 UP
+				case 1:
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 1);
+					break;
+
+				//+20
+				case 2:
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 2);
+					break;
+
+				/////////Time
+				//+10s
+				case 3:
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 3);
+					break;
+
+				////////Acid Rain
+				//-1 UP
+				case 4://Bee's soul lifts, facing left
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 4);
+					break;
+
+					//-1 UP
+				case 5://Bee's soul lifts, facing right
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 5);
+					break;
+
+				////////Popsicle
+				//+50
+				case 6:
+					el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, 6);
+					break;
+
+				deafault:
+					break;
+
+				}
+				
+				
+				bonus_fly_counter++;
+
+				window.draw(el.bonus_rectangle);
+
+				if (bonus_fly_counter == 50)
+				{
+					bonus_item = false;
+					bonus_fly_counter = 0;
+				}
+
+				
+			}
+			
 
 
 			window.display();
@@ -854,7 +931,9 @@ public:
 	//If the bee gets hit by a water drop, its polen score gets reduced to 50% 
 	//of the previous value, and its health drops by a quarter.
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
-	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, const int drop_strike, const int *p,  int stage, int &countdown)
+	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, 
+		const int drop_strike, const int *p,  int stage, int &countdown, bool &bonus_item, 
+		int &bonus_id, const int fly_left, const int fly_right)
 	{
 		collision_counter++;
 
@@ -894,6 +973,13 @@ public:
 								//resets the hp to maximum
 								bumbleBee.set_hp(10);
 								kill.play();
+								bonus_item = true;
+
+								if (fly_left)
+									bonus_id = 4;
+								if (fly_right)
+									bonus_id = 5;
+
 								//if it was the bee's last life, it perishes
 								if (bumbleBee.getLives() == 0)
 									bumbleBee.set_hp(0);
@@ -906,6 +992,8 @@ public:
 								{
 									bumbleBee.add_hp(5);
 									hp_boost.play();
+									bonus_item = true;
+									bonus_id = 0;
 								}
 
 								/*However, if the bee is left with over 10 hp it will be automatically set to 10 again and the player will
@@ -918,12 +1006,16 @@ public:
 									{
 										bumbleBee.alter_lives(1);
 										lifeUp.play();
+										bonus_item = true;
+										bonus_id = 1;
 									}
 
 									else
 									{
 										bumbleBee.add_points(20);
 										bonus.play();
+										bonus_item = true;
+										bonus_id = 2;
 									}
 
 
@@ -942,6 +1034,8 @@ public:
 								countdown = 5;
 								//plays a specific sound effect 
 								time_boost.play();
+								bonus_item = true;
+								bonus_id = 3;
 								break;
 							default:
 								break;

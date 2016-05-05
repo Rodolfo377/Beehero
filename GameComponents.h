@@ -25,6 +25,7 @@ private:
 	sf::Texture spring;
 	sf::Texture summer;
 	sf::Texture summer_special;
+	sf::Texture special_sprites[7];
 	
 
 	int sprite_index = -1;
@@ -47,6 +48,7 @@ public:
 	sf::RectangleShape background;
 	sf::RectangleShape flowers[4];
 	sf::RectangleShape player1;
+	sf::Sprite bonus_rectangle;
 
 	sf::Sprite rainSprite;
 	
@@ -59,7 +61,7 @@ public:
 	sf::Text lives;
 
 	sf::Sprite sprite_score;
-	sf::Sprite special;
+	
 
 	//Sound
 	
@@ -195,6 +197,41 @@ public:
 			std::cout << "Could not find 'fall_background.png'...\n";
 		}
 
+		//Bonus items sprites
+		if (special_sprites[0].loadFromFile("Images/Sprites/plus_five.png") == 0)
+		{
+			std::cout << "Could not find 'plus_five.png'...\n";
+		}
+
+		if (special_sprites[1].loadFromFile("Images/Sprites/1up.png") == 0)
+		{
+			std::cout << "Could not find '1up.png'...\n";
+		}
+
+		if (special_sprites[2].loadFromFile("Images/Sprites/plus_twenty.png") == 0)
+		{
+			std::cout << "Could not find 'plus_twenty.png'...\n";
+		}
+
+		if (special_sprites[3].loadFromFile("Images/Sprites/10s.png") == 0)
+		{
+			std::cout << "Could not find '10s.png'...\n";
+		}
+
+		if (special_sprites[4].loadFromFile("Images/Sprites/bee_ghost_left.png") == 0)
+		{
+			std::cout << "Could not find 'bee_ghost_left.png'...\n";
+		}
+
+		if (special_sprites[5].loadFromFile("Images/Sprites/bee_ghost_right.png") == 0)
+		{
+			std::cout << "Could not find 'bee_ghost_right.png'...\n";
+		}
+
+		if (special_sprites[6].loadFromFile("Images/Sprites/plus_fifty.png") == 0)
+		{
+			std::cout << "Could not find 'plus_fifty.png'...\n";
+		}
 		
 	}
 
@@ -365,16 +402,54 @@ public:
 
 	void loadSpecialSprite(int x, int y, int sprite_id)
 	{
+		
+		bonus_rectangle.setPosition(x, y);
+
 		switch (sprite_id)
 		{
+			//////////Heart
+			//+5 HP
 		case 0:
+			bonus_rectangle.setTexture(special_sprites[0]);
 			break;
+
+			//+1 UP
 		case 1:
+			bonus_rectangle.setTexture(special_sprites[1]);
 			break;
+
+			//+20
 		case 2:
+			bonus_rectangle.setTexture(special_sprites[2]);
 			break;
-		default:
+
+			/////////Time
+			//+10s
+		case 3:
+			bonus_rectangle.setTexture(special_sprites[3]);
 			break;
+
+			////////Acid Rain
+			//-1 UP
+		case 4://Bee's soul lifts
+			//facing left
+			bonus_rectangle.setTexture(special_sprites[4]);
+			break;
+
+		case 5://Bee's soul lifts
+			//facing right
+			bonus_rectangle.setTexture(special_sprites[5]);
+			break;
+
+			////////Popsicle
+			//+50
+		case 6:
+			bonus_rectangle.setTexture(special_sprites[6]);
+			break;
+
+		deafault:
+			break;
+
 		}
 	}
 	/*loads the water drop image to a sprite that can be moved.

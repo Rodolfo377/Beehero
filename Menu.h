@@ -65,7 +65,7 @@ public:
 		}
 		if (cli_menu.loadFromFile("Sound/menu_click.wav") == 0)
 		{
-			std::cout << "'click_select.wav' not found...\n";
+			std::cout << "'menu_click.wav' not found...\n";
 		}
 
 		click.setBuffer(cli_menu);

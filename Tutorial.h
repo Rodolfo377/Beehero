@@ -9,6 +9,8 @@
 
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Window.hpp>
 #include <iostream>
 
 
@@ -17,9 +19,14 @@ take care of events such as pressing buttons with the cursor and making decision
 class Tutorial
 {
 private:
+	sf::Texture objective;
 	sf::Texture first_lesson;
 	sf::Texture second_lesson;
 	sf::RectangleShape screen;
+
+	sf::SoundBuffer click_Buffer;
+	sf::Sound click;
+
 
 public:
 	Tutorial()
@@ -29,11 +36,27 @@ public:
 		loadImage();
 		sf::Event event;
 		
+		if (click_Buffer.loadFromFile("Sound/menu_click.wav") == 0)
+		{
+			std::cout << "'menu_click.wav' not found...\n";
+		}
+
+		click.setBuffer(click_Buffer);
+
+
+		//more_button_counter will keep track of how many times the player has clicked "More", so the program
+		//can show the proper window in the following order: 
+		//1st: Objective
+		//2nd: Commands
+		//3rd: Items
+
+		int more_button_counter = 0;
 
 		while (window.isOpen())
 		{
 			
 
+			
 			int a = sf::Mouse::getPosition(window).x;
 			int b = sf::Mouse::getPosition(window).y;
 			
@@ -47,15 +70,23 @@ public:
 				{
 					
 					if (check_buttons(a, b) == 0)
+					{
+						click.play();
 						window.close();
+					}
 					if (check_buttons(a, b) == 1)
-						screen.setTexture(&second_lesson);
+					{
+						click.play();
+						more_button_counter++;
+						if (more_button_counter == 1)
+							screen.setTexture(&first_lesson);
+						if (more_button_counter == 2)
+							screen.setTexture(&second_lesson);
+					}
 				}
 			}
 
 		
-
-			
 
 			window.clear();
 			window.draw(screen);
@@ -69,6 +100,11 @@ private:
 	//loads the images from the directory that will be displayed in the window
 	void loadImage()
 	{
+		if (objective.loadFromFile("Images/Tutorial/Tutorial_objective.png") == 0)
+		{
+			std::cout << "Could not find 'Tutorial_objective.png' image...\n";
+		}
+
 		if (first_lesson.loadFromFile("Images/Tutorial/Tutorial_1.png") == 0)
 		{
 			std::cout << "Could not find 'Tutorial_1.png' image...\n";
@@ -79,7 +115,7 @@ private:
 			std::cout << "Could not find 'Tutorial_2.png' image...\n";
 		}
 
-		screen.setTexture(&first_lesson);
+		screen.setTexture(&objective);
 		screen.setSize(sf::Vector2f(1000, 600));
 		screen.setPosition(0, 0);
 	}

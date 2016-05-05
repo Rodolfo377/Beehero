@@ -57,8 +57,9 @@ public:Ranking(int newScore)
 	for (int i = 0; i < R_SIZE; i++)
 		updated_Top_Score[i] = previous_Top_Score[i];
 
-	update_score(newScore, updated_Top_Score);
-
+	//If the player's last score entered the top 5 best scores, it will be marked in red
+	int mark_this_red = update_score(newScore, updated_Top_Score);
+	
 	translate_int_to_str(updated_Top_Score, ranking);
 
 	update_ranking_file(ranking);
@@ -71,10 +72,20 @@ public:Ranking(int newScore)
 	 pos[3] = "4th : ";
 	 pos[4] = "5th : ";
 
+	
 
 	//Assigning the updated strings as arguments of a Text object to be displayed on the screen
-	for (int k = 0; k < R_SIZE; k++)
-		bestScores[k] = write(pos[k]+ranking[k], WIDTH / 3, HEIGHT*0.15*(k + 1));
+	 for (int k = 0; k < R_SIZE; k++)
+	 {
+		 
+		 bestScores[k] = write(pos[k] + ranking[k], WIDTH / 3, HEIGHT*0.15*(k + 1));
+
+		 //Sets the player score to the color red if it made to the ranking
+		 if (k == mark_this_red)
+		 {
+			 bestScores[k].setColor(sf::Color::Red);
+		 }
+	 }
 
 	blink.timeLimit = 2;
 	pressKey = write("PRESS ANY KEY TO LEAVE", WIDTH / 5, HEIGHT*0.85);
@@ -115,7 +126,7 @@ public:Ranking(int newScore)
 private:
 	/*The method update_score() will determine how the score ranking will be altered after taking into
 	account the player's lastest try.*/
-	void update_score(int newScore, int *score_array)
+	int update_score(int newScore, int *score_array)
 	{
 		//Will store the values of the score_array pointer (elements of the array entered as a parameter)
 		int copy_original[R_SIZE];
@@ -126,7 +137,7 @@ private:
 
 		int i = 0;
 		int index = 0;
-
+		int mostRecent;
 	
 
 		//Loop looks for the first element of the original array that is lower than the newest score 
@@ -139,6 +150,7 @@ private:
 			if (newScore > *(score_array + i))
 			{
 				index = i;
+				mostRecent = index;
 				//Makes sure the next loop wont happen
 				i = 1000;
 				score_array[index] = newScore;
@@ -159,7 +171,7 @@ private:
 			}
 
 		}
-		
+		return mostRecent;
 	}
 
 	/*The code of the function below 'read_ranking_file()' was adaptded from 
