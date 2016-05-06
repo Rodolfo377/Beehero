@@ -7,6 +7,26 @@
 #ifndef HEIGHT
 #define HEIGHT 600
 #endif
+/* Classes.h
+This header provides the game with a set of classes that Encapsulate instructions and information that are deeply related
+with specifc concepts.
+
+In class Flowers, we see  a polen variable determines how many grains of polen can be harvested 
+in each flower. This class also features the method harvest(), that keeps track of how much 
+polen was collected in a given flower, and gives a boolean false value when there is nothing more to collect
+
+Class bee stores a set of variables that concern the bee, which are:
+>HP
+>Polen
+>Lives
+
+which can be accessed and modified by different methods, providing an extra layer of security to the program.
+
+
+On the bottom of the file, the class StandardWindow  includes a set of methods and variables that are very useful 
+building a window. For example, method 'write' takes a string and integer values as coordinates in order to place
+a Text object in the window. however, the class in meaningless by itself. It is only useful when inherited by another 
+class. */
 
 
 class Flowers

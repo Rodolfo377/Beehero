@@ -19,7 +19,17 @@
 
 #define GAMETIME 100
 
+/**
+*	The StartGame header is definetly the core of this game, which can be seen by the over-1000-lines code below.
+	Inside this file, you will find event handling, logic implementation and graphics rendering. Furthermore, every piece 
+	of the game mechanics is defined here, divided by modular functions which only have access to absolutely necessary information,
+	demonstrating the use of the information hiding principle. It makes the program more robust and protected from errors.
 
+
+	This class StartGame plays a major role on the programme. It is reponsible for the mechanics and graphics of the game, making use of 
+	functions from GameComponents.h (for graphics), Classes.h for specific interactions (Bees and flowers) and Methods.h for general
+	methods, e.g. random number generation. 
+*/
 
 /*The source code is adapted from a Udemy Course called 'Learn c++ game development' https://www.udemy.com/learn-c-game-development/
 in which the basic functionality of the SFML library is explored. However, this game has its own mechanics and art.*/
@@ -156,15 +166,8 @@ public:
 		blessed_50.setBuffer(popsicle);
 
 		collect.setVolume(40);
-		//Music
-
-		
-
-		
-
-		game.timeLimit = GAMETIME;
-
-		
+	
+		game.timeLimit = GAMETIME;		
 
 		rain.push_back(el.rainSprite);
 		r.timeLimit = 2;
@@ -185,6 +188,7 @@ public:
 	public: bool gameLoop(int stage)
 	{
 	 
+		//Each stage has its own scenario, according to the seasons of the year
 		el.load_background(stage);
 
 		//States
@@ -220,10 +224,13 @@ public:
 		bool bonus_item = false;
 
 		//Basic window setup
-		sf::RenderWindow window(sf::VideoMode(1000, HEIGHT), "BeeHero");
+		//sf::Style::Titlebar| sf::Style::Close options prevent window from being resized, which would 
+		//harm the game's well functioning since every aspect depends on the player's position in the screen (in pixels)
+		sf::RenderWindow window(sf::VideoMode(1000, HEIGHT), "BeeHero", sf::Style::Titlebar| sf::Style::Close);
 		window.setFramerateLimit(60);
 		window.setKeyRepeatEnabled(false);
-
+		window.setMouseCursorVisible(false);
+		
 
 		//speed of the bee, in pixels per iteration
 		int speed = 2*stage;
@@ -243,12 +250,19 @@ public:
 		//index of the flower that is available (from 0 to 3)
 		int flower_id = 0;
 		int times_stop = 0;
-		int space_count = 0;
 		
+		//polen_Score keeps track of the current score of the player so it can be passed to the function
+		//el.loadScore(polen_Score); , which will print the most recent score on the screen on each loop
 		int polen_Score = 0;
+		//fly_counter controls how many pixels a sprite has rised - visual effects sprites- so they will be lifted no more than 50 px
+		//above the player and will then disappear - i.e., not drawn anymore
 		int fly_counter = 0;
+		//health_Points keeps track of the current HP of the player so it can be passed to the function
+		//el.load_hp(health_points) , which will print the most recent HP on the screen on each loop
 		int health_points = 0;
-		//collision_counter variable determines how many times the function take_damage has been called, so it wont unnecessarily repeat its comands
+
+		//collision_counter variable determines how many times the function take_damage has detected a collision, 
+		//so it wont unnecessarily repeat its commands
 		int collision_counter = 0;
 		//blink variable determines how many times the bee has blinked - used in blink_bee() function
 		int blink = 0;
@@ -257,6 +271,10 @@ public:
 		//and it does so for 3 different items: 3x2 = 6 places.
 		int water_item[6];
 		
+		//flower_available is an index, from 0 to 3, relating to one of the four flowers on the screen,
+		//This index tells the code which flower is available to be harvested, which will load a different image
+		//(el.loadScoreSprite(flower_available);) for the chosen flower, which will help the player visualize which 
+		//flower is available.
 		int flower_available = 0;
 		set_new_flower(flower_available);
 		el.loadScoreSprite(flower_available);
@@ -266,10 +284,17 @@ public:
 		//invoking the timer_check() method for the first time makes the timer start
 		steady_rain.timer_check();
 
-		int five_seconds_counter = 0;
+		//five_seconds_loop works as a control to sound off a beep at the last 5 seconds of the game
+		//that is, a countdown at the end of each stage so the player will know the time is up.
 		int five_seconds_loop = 5;
+		//exact_time will store a random number between 10 and 80 corresponding to the seconds left in the summer round
+		//when the popsicle plastic cover will be temporarily (3 seconds) removed and the player is able to collect 50 points from it.
+		//setRandomTime will set the aleatory number and the value will be copied to exact_time
 		int exact_time = 0;
 
+		//bonus_id will store an identification for a bonus item that the player has collected, which can be:
+		//1-Rain Drops' items
+		//2-popsicle
 		int bonus_id = -1;
 		int bonus_fly_counter = 0;
 
@@ -362,6 +387,7 @@ public:
 			move_drop(placed, speed+2);
 
 			
+			//Popsicle Easter egg implementation
 			if (stage == 2 && bonus_available == true)
 			{
 				//If, during the summer stage, the time remaining is equal to the random time for the popsicle to be shown
@@ -605,6 +631,7 @@ public:
 
 				
 			}
+			//resets the collision_counter value to zero after no collision is detected anymore
 			if (detect_collision_water(drop_strike) == false)
 			{
 				collision_counter = 0;
@@ -612,7 +639,7 @@ public:
 
 
 
-			//Scanning
+			//Scanning the bee's perimeter to see if it is inside a flower's 'air space'
 			for (int i = 0; i < 4; i++)
 			{	
 				//if the bee is inside the flower space, the index of the flower 
@@ -633,13 +660,13 @@ public:
 					}
 				}
 			}
-
+			//If the bee is inside a flower's air space, the program will store the coordinates of the right-hand upper corner of the
+			//flower and use it as a reference to guide the bee in and out of the flower
 			if (collecting == true)
 			{
 				tempX = (int)el.flowers[flower_id].getPosition().x;
 				tempY = (int)el.flowers[flower_id].getPosition().y;
 
-				//el.player1.move(tempX, tempY);
 
 				if (stop == false && leave == false)
 				{
@@ -648,13 +675,14 @@ public:
 
 					flower_in_smooth(tempX, tempY, stop);
 				}
+
 				//Holds the bee on the flower while it collects pollen
 				if (stop == true)
 				{
 					flower_stop(fly_right, times_stop, tempX, tempY);
 				}
 
-				//Smooth transition out of the flower
+				//Smooth transition off the flower
 				if (stop == false && leave == true)
 				{
 					flower_out_smooth(tempX, tempY, flower_id, flower_available, leave, collecting, speed);
@@ -662,7 +690,9 @@ public:
 
 			}
 
-			//Checks if bee is inside the window boundaries
+
+
+			//Checks and makes sure the bee  stays inside the window's boundaries
 			//x-axis, invert the current x velocity of the bee
 			if (el.player1.getPosition().x < 0 || el.player1.getPosition().x > WIDTH - 30)
 				el.player1.move(-beeXVelocity, 0);
@@ -672,8 +702,11 @@ public:
 				el.player1.move(0, -beeYVelocity);
 
 			/****************Rendering******************/
+			//Draws every graphics on the game window after all the logic implementation and event handling has been done in the game loop
 
+			//erases all the content the was on the screen previously
 			window.clear();
+			//draws the round's proper weather background
 			window.draw(el.background);
 
 			//draws all the 4 flowers on the screen
@@ -681,7 +714,9 @@ public:
 			{
 				window.draw(el.getFlower(j));
 			}
-			//std::cout << "harvesting: " << harvesting << "\n";
+			
+			//When the bee is hurt, it blinks. In other words, the bee image will not be drawn in some frames, and since the frames
+			//are rendered very quickly, it will yield the desired "blinking effect"
 			if (show_bee == true)
 			{
 				window.draw(el.player1);
@@ -693,7 +728,7 @@ public:
 
 			for (int i = 0; i < (int)rain.size(); i++)
 			{
-				/*If a water drop collided with the bee, it will disappear-wont be drawn anymore*/
+				/*If a water drop collided with the bee, the rain drop will disappear-wont be drawn anymore*/
 				if (invisible_drop == true)
 				{
 					if (i != drop_strike)
@@ -707,6 +742,8 @@ public:
 			}
 
 			//Draws the +1 sprite each time  the player harvests a flower
+			//To avoid implementation issues concerning polen harvesting and bonus items sprites, they were implemented
+			//separately.
 			if (harvesting == true)
 			{
 				window.draw(el.sprite_score);
@@ -715,6 +752,11 @@ public:
 
 			/*If the player catches any item from the rain (heart, time or death) or is lucky to get the pospcile, a special
 			sprite will be drawn on the screen*/
+
+			//For matters of security, a switch case statement was used in place of a simple  
+			//el.loadSpecialSprite(el.player1.getPosition().x, el.player1.getPosition().y - bonus_fly_counter, X);
+			//X being an index representing which bonus item it is. Using a switch case statement avoids the case where X could have 
+			//a value that is outside the array boundaries of the bonus item sprites in  GameComponents.h
 			if (bonus_item == true)
 			{
 				switch(bonus_id)
@@ -763,11 +805,15 @@ public:
 
 				}
 				
-				
+				//Every time this loop is accessed, the specific sprite will rise 1 pixel, and this is done using 
+				//bonus_fly_counter, an integer variable that is incremented everytime the if statement is true until it reaches
+				//50 pixels above the bee's current position
 				bonus_fly_counter++;
 
 				window.draw(el.bonus_rectangle);
 
+				//resets the variable bonus_fly_counter if the sprite was raised 50 px above its first position
+				//bonus_item is set to false so this if statement does not get repeated unless another bonus item was caught by the user 
 				if (bonus_fly_counter == 50)
 				{
 					bonus_item = false;
@@ -803,6 +849,8 @@ public:
 	*/
 	private:
 
+	//the bee image is directed towards the flower image in the x and y axis at the same time
+		//player can still move the bee outwards - to escape a dangerous rain drop, for example- , however, with a slower speed.
 	void flower_in_smooth(const int tempX, const int tempY, bool &stop)
 	{
 
@@ -818,16 +866,17 @@ public:
 			stop = true;
 	}
 
+	//holds the player still
 	void flower_stop(bool &fly_right, int &times_stop, const int tempX, const int tempY)
 	{
 		times_stop += 1;
 		fly_right = true;
 		el.player1.setPosition((int)tempX + 20, (int)tempY);
-
-
 	}
 
-	void flower_out_smooth(const int tempX, const int tempY, int &flower_id,  int &flower_available, bool &leave, bool &collecting, const int speed)
+	//quickly rises the bee outside the flower's air space
+	void flower_out_smooth(const int tempX, const int tempY, int &flower_id,  int &flower_available, 
+		bool &leave, bool &collecting, const int speed)
 	{
 		if (el.player1.getPosition().y >= tempY - 40)
 		{
@@ -849,6 +898,7 @@ public:
 		}
 	}
 
+	//randomly selects a new flower to be harvested 
 	void set_new_flower(int &flower_available)
 	{
 		flower_available = game.random_n_generator(0, 4);
@@ -858,6 +908,7 @@ public:
 		el.setEmptyFlowers(flower_available);
 	}
 
+	//In the first part of the game, each drop is created and then falls separately, being stored in a vector
 	void create_drop()
 	{
 		//small pause after the drop is created then moved
@@ -869,15 +920,20 @@ public:
 			r.reset_timer();
 
 		}
-		//places the last created drop at a specific place
+		//places the last created drop at a specific place, respecting a given interval (75 px)
 
 		rain[rain.size() - 1].setPosition( (float)((rain.size()) * 75)  - 10, 0);
 
 
 	}
 
+	//makes the rain drops move on the screen, giving the "rain effect"
+	//Based on the placed variable and the speed - the arguments - the manner of this movement 
+	//will be different.
 	void move_drop(const bool placed, const int speed)
 	{
+		//If the items have not been placed yet, that is, it is the first stage of the rain, one rain drop
+		//Will fall at a time.
 		if (placed == false)
 		{
 			for (int i = 0; i < rain.size(); i++)
@@ -892,15 +948,18 @@ public:
 					}//if
 				}//if
 
+				//moves a specific rain drop sprite as the rain vector is being created
 				else
 				{
 					rain[i].move(0, speed);
 				}//else
 			}//for
 		}//if(placed == false)
+
+		//This portion deals with the second stage of the rain, which contains items and the rain falls steadily
 		if (placed == true && r.timer_check() <= 0)
 		{
-
+			//Since the vector has already been created, the rain drops will all come down at the same time.
 			for (int j = 0; j < rain.size(); j++)
 			{
 				rain[j].move(0, speed);
@@ -913,6 +972,7 @@ public:
 
 	}//move_drop()
 
+	//Checks if there was a bee-rain drop collision and returns a boolean value 'true' if positive, and 'false' if negative.
 	bool detect_collision_water(int &drop_strike)
 	{
 		bool wet = false;
@@ -931,6 +991,7 @@ public:
 	//If the bee gets hit by a water drop, its polen score gets reduced to 50% 
 	//of the previous value, and its health drops by a quarter.
 	//However, if the bee catches a drop that has an item in it, the proper effects are taking place
+
 	void take_damage(const bool placed, bool &hurt, bool &item_picked, int &collision_counter, 
 		const int drop_strike, const int *p,  int stage, int &countdown, bool &bonus_item, 
 		int &bonus_id, const int fly_left, const int fly_right)
@@ -1069,6 +1130,9 @@ public:
 		}
 	}
 
+	//makes the bee image not visible if the counter 'blink' is not a product of three.
+	//blink is incremented for a few senconds until the raind drop stunning effect has passed.
+	//The bee's visibilty is controlled by the 'show_bee' variable
 	void blink_bee( bool &show_bee, int &blink)
 	{
 		
@@ -1085,7 +1149,10 @@ public:
 	//this function will place a random item inside a water drop from the 4th to the 10th rain array elements, from left to right
 	//Also, two pre-defined items (purple death skull) will be located at each side of the random item.
 	
-	The function starts by placing the random item (time boost, health boost, or death skull), identified by the parameter 'itemcode'*/
+	The function starts by placing the random item (time boost, health boost, or death skull), identified by the parameter 'itemcode'.
+	The function place_item return a pointer to the first element of the array of rain drops, so it can be later copied in the game loop.
+	
+	*/
 	int * place_item()
 	{
 		int itemcode = 0;
@@ -1098,17 +1165,19 @@ public:
 			if (itemcode == 0)
 			{
 				//sets the rain drop in which the item is going to be in  random fashion
-				//designed to be located as centre as possible (i.e., close to the flowers and the player)
-				//int limit = drops_number - 4;
+				//designed to be located as close to the centre as possible (i.e., close to the flowers and the player)
+				
+				//a random number from 3 to 9 is generated and assigned to drop_id
 				drop_id = game.random_n_generator(3, 6);
 				
 		
 				//sets the item that is going to be displayed inside the chosen rain drop
+				//a random number from 1 to for is generated and assigned to item_id
 				item_id = game.random_n_generator(1, 3);
 			}
 
 
-			//places at least one death item besides another item
+			//places  one death item at each side of the chosen item
 			//itemcode values 1 and 2 are used so in different iteractions it can place the
 			//deadly items besides a random item, using the variable item_id.
 			if (itemcode == 2 || itemcode == 4)
@@ -1118,17 +1187,21 @@ public:
 
 				if (itemcode == 2)
 				{
+					//places the skull one position to the right of the random item
 					if (drop_id < drops_number-1)
 						drop_id = temp_id + 1;
 				}
 				if (itemcode == 4)
 				{
+					//drop_id has moved one position to the right, so now it has to go back 2 positions to the left 
+					//so the skull can be placed on the left side of the random item
 					if (drop_id > 1)
 						drop_id = temp_id - 2;
 				}
 
 			}
 
+			//selects specific images to represent the items inside the water drops
 			switch (item_id)
 			{
 
@@ -1151,6 +1224,10 @@ public:
 		return special_item;
 	}
 
+
+	//Functions getBeeLives(), getBeePolen() and getBeeHP() provide the main function (in Main.cpp) with data of the player's
+	//Number of lives, polen collected, and HP, respectively, at the end of each stage so then  HoneyScore.h can calculate and display
+	//The total score (Honey) for each stage.
 	public:
 
 	int getBeeLives()
@@ -1171,15 +1248,12 @@ public:
 	{
 		Methods specialItem;
 		int t = specialItem.random_n_generator(10, 80);
-		setSpecialItem(t);
+		
 
 		return t;
 	}
 
-	void setSpecialItem(int instant)
-	{
-
-	}
+	
 	
 
 };

@@ -17,6 +17,19 @@
 #define HEIGHT 600
 #endif
 
+/**
+*
+	This class will take care of calculating the total score (Honey) based on three factors:
+	1-Polen
+	2-Bee's Health
+	3-Number of lives
+
+	Honey will be produced according to the followig equation:
+	Honey = Polen X HP X Lives
+	
+	In other words, if any of the factors is equal to zero, no honey will be made.
+*/
+
 class HoneyScore:public StandartWindow
 {
 	

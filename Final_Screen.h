@@ -13,7 +13,7 @@
 #endif
 
 /*Class 'Winter' is responsible for showing the player's performance in an interactive way:
-Depending on the player's overall score (calculated by the sum of the 3 rounds' play),
+Depending on the player's overall score (calculated by the sum of the 3 rounds' honey),
 A certain number of bee hives will appear on the tree, according to the following criteria:
 
 Score Band ---- Bee Hives
@@ -36,6 +36,7 @@ class Winter : public StandartWindow
 	sf::Sound collect;
 	sf::Text roundText[3];
 	sf::Text totalHoney;
+	sf::Text performance_message;
 	sf::Text thanks;
 	sf::Text presskey;
 
@@ -59,6 +60,10 @@ public:
 			int final_score = 0;
 			int round_score = 0;
 			int round_counter = 0;
+
+			//first_time says if it is the first time the !counting conditio is executed, so the performance message will
+			//only need to be chosen once.
+			bool first_time = true;
 			
 			collect.setBuffer(collectBuffer);
 			collect.setVolume(40);
@@ -70,6 +75,7 @@ public:
 			bool counting = true;
 			
 			chooseImage(final_score);
+			
 
 			//round_counter is a variable that will help making the final sum of the scores (the one visually displayed) 
 			//quicker to the user.
@@ -192,7 +198,12 @@ public:
 					totalHoney.setCharacterSize(22);
 					window.draw(totalHoney);
 
-
+					if (first_time)
+					{
+						chooseMessage(final_score);
+						first_time = false;
+					}
+					window.draw(performance_message);
 					window.draw(thanks);
 					blink_item();
 
@@ -245,7 +256,7 @@ private:
 	
 
 		if (final_score == 0)	
-			canvas.setTexture(&hive[0]);
+			canvas.setTexture(&hive[0]); 
 		else if (final_score > 0 && final_score < 5000)
 			canvas.setTexture(&hive[1]);
 		else if (final_score >= 5000 && final_score < 10000)
@@ -258,5 +269,23 @@ private:
 			canvas.setTexture(&hive[5]);
 		else if (final_score >= 25000)
 			canvas.setTexture(&hive[6]);
+	}
+
+	void chooseMessage(const int final_score)
+	{
+		if (final_score == 0)
+			performance_message = write("Your colony is extinct!!!", 400, 400);
+		else if (final_score > 0 && final_score < 5000)
+			performance_message = write("Your colony will survive!", 400, 400);
+		else if (final_score >= 5000 && final_score < 10000)
+			performance_message = write("Good job! Keep it up!", 400, 400);
+		else if (final_score >= 10000 && final_score < 15000)
+			performance_message = write("Yay! Your colony is prospering!", 400, 400);
+		else if (final_score >= 15000 && final_score < 20000)
+			performance_message = write("You sure you aren't a bee?", 400, 400);
+		else if (final_score >= 20000 && final_score < 25000)
+			performance_message = write("Yep, you're definetly a bee.", 400, 400);
+		else if (final_score >= 25000)
+			performance_message = write("World domination FTW!!!", 400, 400);
 	}
 };
